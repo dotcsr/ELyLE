@@ -1,0 +1,2507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#1a1025">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>ELyLE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════
+   DESIGN TOKENS — LIGHT MODE
+═══════════════════════════════════════════ */
+:root {
+  --bg:        #faf9f7;
+  --bg2:       #f3f1ee;
+  --surface:   #ffffff;
+  --surface2:  #f8f7f5;
+  --border:    #e8e4df;
+  --border2:   #d4cfc9;
+  --text1:     #1c1917;
+  --text2:     #57534e;
+  --text3:     #a8a29e;
+  --text-inv:  #ffffff;
+
+  /* Andrea = rosa luna */
+  --rose:      #e8778a;
+  --rose-l:    #fdf2f4;
+  --rose-d:    #c1435a;
+  --rose-glow: rgba(232,119,138,.18);
+
+  /* César = sol dorado */
+  --gold:      #d4a832;
+  --gold-l:    #fffbee;
+  --gold-d:    #a07820;
+  --gold-glow: rgba(212,168,50,.18);
+
+  /* Accent dinámico (se sobrescribe por usuario) */
+  --acc:       var(--rose);
+  --acc-l:     var(--rose-l);
+  --acc-d:     var(--rose-d);
+  --acc-glow:  var(--rose-glow);
+
+  /* Semantic */
+  --green:     #22c55e; --green-l: #f0fdf4; --green-d: #15803d;
+  --red:       #ef4444; --red-l:   #fef2f2; --red-d:   #b91c1c;
+  --blue:      #3b82f6; --blue-l:  #eff6ff; --blue-d:  #1d4ed8;
+  --amber:     #f59e0b; --amber-l: #fffbeb; --amber-d: #b45309;
+  --purple:    #8b5cf6; --purple-l:#f5f3ff; --purple-d:#6d28d9;
+
+  --r:   14px;
+  --r-s:  9px;
+  --r-l: 20px;
+  --sh:  0 2px 12px rgba(0,0,0,.07);
+  --sh2: 0 6px 30px rgba(0,0,0,.11);
+  --sh3: 0 16px 50px rgba(0,0,0,.15);
+  --tr:  .22s cubic-bezier(.4,0,.2,1);
+
+  --font-d: 'Cormorant Garamond', serif;
+  --font-b: 'Inter', sans-serif;
+
+  --nav-h: 64px;
+  --hdr-h: 56px;
+}
+
+/* DARK MODE */
+.dark {
+  --bg:       #0f0e14;
+  --bg2:      #18151f;
+  --surface:  #1e1b26;
+  --surface2: #252231;
+  --border:   #2e2b3a;
+  --border2:  #3d3950;
+  --text1:    #f1eff5;
+  --text2:    #a09ab8;
+  --text3:    #635e78;
+  --sh:  0 2px 12px rgba(0,0,0,.3);
+  --sh2: 0 6px 30px rgba(0,0,0,.4);
+  --sh3: 0 16px 50px rgba(0,0,0,.55);
+  --rose-l:  rgba(232,119,138,.12);
+  --gold-l:  rgba(212,168,50,.12);
+  --green-l: rgba(34,197,94,.12);
+  --red-l:   rgba(239,68,68,.12);
+  --blue-l:  rgba(59,130,246,.12);
+  --amber-l: rgba(245,158,11,.12);
+  --purple-l:rgba(139,92,246,.12);
+}
+
+/* ═══════════════════════════════════════════ BASE ═══ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-tap-highlight-color: transparent; height: 100%; }
+body {
+  font-family: var(--font-b);
+  background: var(--bg);
+  color: var(--text1);
+  min-height: 100%;
+  overflow-x: hidden;
+  transition: background var(--tr), color var(--tr);
+}
+button { font-family: var(--font-b); cursor: pointer; border: none; background: none; }
+input, textarea, select { font-family: var(--font-b); }
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+
+/* ═══════════════════════════════════════════
+   SPLASH / PIN SCREEN
+═══════════════════════════════════════════ */
+#splash {
+  position: fixed; inset: 0;
+  background: linear-gradient(160deg, #0f0e14 0%, #1a1025 50%, #0e1520 100%);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  z-index: 9000; padding: 32px;
+  gap: 0;
+}
+.splash-stars {
+  position: absolute; inset: 0; overflow: hidden; pointer-events: none;
+}
+.star {
+  position: absolute; border-radius: 50%;
+  background: white; animation: twinkle var(--d,3s) infinite var(--delay,0s);
+}
+@keyframes twinkle {
+  0%,100% { opacity: var(--op,.3); transform: scale(1); }
+  50%      { opacity: 1;           transform: scale(1.4); }
+}
+.splash-logo {
+  font-family: var(--font-d);
+  font-size: clamp(3rem,10vw,4.5rem);
+  font-weight: 300;
+  letter-spacing: .05em;
+  color: #fff;
+  text-align: center;
+  line-height: 1;
+  margin-bottom: 4px;
+  animation: fadeUp .8s ease both;
+}
+.splash-sub {
+  font-family: var(--font-d);
+  font-style: italic;
+  font-size: clamp(.85rem,2.5vw,1rem);
+  color: rgba(255,255,255,.45);
+  letter-spacing: .15em;
+  text-align: center;
+  animation: fadeUp .8s .15s ease both;
+  margin-bottom: 40px;
+}
+@keyframes fadeUp {
+  from { opacity:0; transform:translateY(16px); }
+  to   { opacity:1; transform:none; }
+}
+
+/* Profile selector */
+.profile-row {
+  display: flex; gap: 14px; width: 100%; max-width: 320px;
+  animation: fadeUp .8s .3s ease both;
+}
+.profile-btn {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; gap: 10px;
+  padding: 20px 12px; border-radius: var(--r-l);
+  border: 1.5px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.06);
+  backdrop-filter: blur(12px);
+  transition: var(--tr); color: #fff;
+}
+.profile-btn:hover, .profile-btn:active {
+  border-color: rgba(255,255,255,.3);
+  background: rgba(255,255,255,.11);
+  transform: translateY(-3px);
+}
+.profile-icon { font-size: 36px; }
+.profile-name {
+  font-family: var(--font-d);
+  font-size: 1.3rem; font-weight: 400;
+  letter-spacing: .02em;
+}
+.profile-hint { font-size: .7rem; color: rgba(255,255,255,.4); }
+
+/* PIN screen */
+#pin-screen {
+  display: none; flex-direction: column;
+  align-items: center; gap: 20px;
+  animation: fadeUp .4s ease both;
+  width: 100%; max-width: 300px;
+}
+#pin-screen.active { display: flex; }
+.pin-title {
+  font-family: var(--font-d); font-size: 1.6rem; font-weight: 300;
+  color: #fff; text-align: center; letter-spacing: .03em;
+}
+.pin-sub { font-size: .8rem; color: rgba(255,255,255,.4); text-align: center; }
+.pin-dots { display: flex; gap: 12px; }
+.pin-dot {
+  width: 14px; height: 14px; border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.3);
+  transition: var(--tr);
+}
+.pin-dot.filled { background: var(--acc); border-color: var(--acc); }
+.pin-numpad {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 10px; width: 100%;
+}
+.pin-key {
+  height: 58px; border-radius: var(--r);
+  background: rgba(255,255,255,.08);
+  color: #fff; font-size: 1.3rem; font-weight: 400;
+  border: 1px solid rgba(255,255,255,.08);
+  transition: var(--tr);
+}
+.pin-key:hover, .pin-key:active {
+  background: rgba(255,255,255,.17);
+  transform: scale(.96);
+}
+.pin-key.wide { grid-column: span 2; font-size: .85rem; }
+.pin-key.del  { font-size: 1.1rem; }
+.pin-err {
+  color: #f87171; font-size: .82rem;
+  animation: shake .3s ease;
+  min-height: 20px; text-align: center;
+}
+@keyframes shake {
+  0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}
+}
+.pin-back-btn {
+  color: rgba(255,255,255,.4); font-size: .8rem;
+  background: none; border: none; cursor: pointer; margin-top: -8px;
+}
+
+/* ═══════════════════════════════════════════
+   TOAST (no banner — subtle bottom toast)
+═══════════════════════════════════════════ */
+#toast {
+  position: fixed; bottom: calc(var(--nav-h) + 12px); left: 50%;
+  transform: translateX(-50%) translateY(0);
+  background: var(--text1); color: var(--text-inv);
+  padding: 10px 18px; border-radius: 30px;
+  font-size: .82rem; font-weight: 500;
+  white-space: nowrap; z-index: 8000;
+  box-shadow: var(--sh2);
+  opacity: 0; pointer-events: none;
+  transition: opacity .2s ease, transform .2s ease;
+  max-width: 85vw; white-space: normal; text-align: center;
+}
+#toast.show { opacity: 1; }
+.dark #toast { background: var(--surface2); color: var(--text1); }
+
+/* ═══════════════════════════════════════════
+   APP SHELL
+═══════════════════════════════════════════ */
+#app { display: none; min-height: 100vh; }
+#app.active { display: block; }
+
+/* ── HEADER ── */
+.hdr {
+  height: var(--hdr-h);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 18px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; z-index: 200;
+  transition: background var(--tr);
+}
+.hdr-brand {
+  font-family: var(--font-d);
+  font-size: 1.25rem; font-weight: 300;
+  letter-spacing: .06em;
+  color: var(--text1);
+}
+.hdr-user {
+  display: flex; align-items: center; gap: 9px;
+}
+.hdr-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--acc-l);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  border: 1.5px solid var(--acc);
+}
+.hdr-name {
+  font-size: .85rem; font-weight: 500; color: var(--acc-d);
+}
+.hdr-menu-btn {
+  width: 32px; height: 32px; border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text2); font-size: 18px;
+  transition: var(--tr);
+}
+.hdr-menu-btn:hover { background: var(--bg2); }
+
+/* ── BOTTOM NAV (4 items only) ── */
+.bnav {
+  position: fixed; bottom: 0; left: 0; right: 0;
+  height: var(--nav-h);
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex; align-items: stretch;
+  padding-bottom: env(safe-area-inset-bottom);
+  z-index: 200;
+  box-shadow: 0 -4px 20px rgba(0,0,0,.06);
+  transition: background var(--tr);
+}
+.ni {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 3px;
+  color: var(--text3); font-size: .6rem; font-weight: 500;
+  transition: var(--tr); border-radius: 10px; margin: 4px;
+  position: relative;
+}
+.ni-icon { font-size: 20px; transition: transform var(--tr); }
+.ni.active { color: var(--acc-d); }
+.ni.active .ni-icon { transform: scale(1.15); }
+.ni-dot {
+  position: absolute; top: 6px; right: calc(50% - 14px);
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--acc); display: none;
+}
+.ni-dot.show { display: block; }
+
+/* ── MORE MENU (side sheet) ── */
+.more-sheet {
+  position: fixed; inset: 0; z-index: 1000;
+  pointer-events: none;
+}
+.more-sheet.open { pointer-events: all; }
+.more-backdrop {
+  position: absolute; inset: 0;
+  background: rgba(0,0,0,.4); backdrop-filter: blur(4px);
+  opacity: 0; transition: opacity var(--tr);
+}
+.more-sheet.open .more-backdrop { opacity: 1; }
+.more-panel {
+  position: absolute; top: 0; right: 0; bottom: 0;
+  width: min(280px, 80vw);
+  background: var(--surface);
+  border-left: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  transform: translateX(100%);
+  transition: transform var(--tr);
+  box-shadow: var(--sh3);
+  overflow-y: auto;
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+.more-sheet.open .more-panel { transform: translateX(0); }
+.more-header {
+  padding: 22px 20px 16px;
+  border-bottom: 1px solid var(--border);
+}
+.more-header h3 {
+  font-family: var(--font-d); font-size: 1.3rem; font-weight: 400;
+  color: var(--text1);
+}
+.more-item {
+  display: flex; align-items: center; gap: 14px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--tr); cursor: pointer;
+  color: var(--text1); font-size: .9rem;
+}
+.more-item:hover { background: var(--bg2); }
+.more-item .mi-icon { font-size: 20px; width: 28px; text-align: center; }
+.more-item .mi-label { flex: 1; }
+.more-item .mi-arrow { color: var(--text3); font-size: .8rem; }
+
+/* ── FAB ── */
+.fab {
+  position: fixed; bottom: calc(var(--nav-h) + 14px); right: 18px;
+  width: 50px; height: 50px; border-radius: 50%;
+  background: var(--acc); color: #fff;
+  font-size: 24px; font-weight: 300;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 18px var(--acc-glow), 0 2px 8px rgba(0,0,0,.15);
+  transition: var(--tr); z-index: 150;
+}
+.fab:hover, .fab:active { transform: scale(1.08) rotate(45deg); background: var(--acc-d); }
+
+/* ── CONTENT ── */
+.content {
+  padding: 16px 15px calc(var(--nav-h) + 24px);
+  max-width: 600px; margin: 0 auto;
+}
+.page { display: none; }
+.page.active {
+  display: block;
+  animation: pageIn .28s cubic-bezier(.4,0,.2,1) both;
+}
+@keyframes pageIn {
+  from { opacity:0; transform: translateY(12px); }
+  to   { opacity:1; transform: none; }
+}
+
+/* ═══════════════════════════════════════════
+   MODALS (bottom sheets)
+═══════════════════════════════════════════ */
+.ov {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,.5); backdrop-filter: blur(6px);
+  z-index: 3000;
+  display: flex; align-items: flex-end; justify-content: center;
+  opacity: 0; pointer-events: none; transition: opacity var(--tr);
+}
+.ov.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: var(--surface);
+  border-radius: 22px 22px 0 0;
+  padding: 20px 20px calc(24px + env(safe-area-inset-bottom));
+  width: 100%; max-width: 520px;
+  max-height: 88vh; overflow-y: auto;
+  transform: translateY(30px);
+  transition: transform var(--tr);
+  border-top: 1px solid var(--border);
+}
+.ov.open .modal { transform: translateY(0); }
+.modal-pill {
+  width: 38px; height: 4px; background: var(--border2);
+  border-radius: 4px; margin: 0 auto 18px; cursor: pointer;
+}
+.modal h3 {
+  font-family: var(--font-d);
+  font-size: 1.45rem; font-weight: 400;
+  color: var(--text1); margin-bottom: 18px;
+}
+
+/* ═══════════════════════════════════════════
+   FORM ELEMENTS
+═══════════════════════════════════════════ */
+.fg { margin-bottom: 14px; }
+.fg label {
+  display: block; font-size: .78rem; font-weight: 600;
+  color: var(--text2); margin-bottom: 6px;
+  letter-spacing: .03em; text-transform: uppercase;
+}
+.fi, .fta, .fsel {
+  width: 100%; padding: 11px 13px;
+  border: 1.5px solid var(--border);
+  border-radius: var(--r-s);
+  font-size: .92rem; color: var(--text1);
+  background: var(--bg);
+  transition: var(--tr); outline: none;
+  -webkit-appearance: none;
+}
+.fi:focus, .fta:focus, .fsel:focus {
+  border-color: var(--acc); background: var(--surface);
+  box-shadow: 0 0 0 3px var(--acc-glow);
+}
+.fta { resize: vertical; min-height: 78px; }
+.fsel {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23a8a29e' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 34px;
+}
+
+/* ── BUTTONS ── */
+.btn {
+  padding: 11px 18px; border-radius: var(--r-s);
+  font-size: .88rem; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: var(--tr); white-space: nowrap;
+}
+.btn-p { background: var(--acc); color: #fff; }
+.btn-p:hover, .btn-p:active { background: var(--acc-d); transform: translateY(-1px); }
+.btn-s {
+  background: var(--bg2); color: var(--text2);
+  border: 1.5px solid var(--border);
+}
+.btn-s:hover { background: var(--border); }
+.btn-d { background: var(--red-l); color: var(--red-d); }
+.btn-d:hover { background: #fecaca; }
+.btn-f { width: 100%; justify-content: center; }
+.btn-sm { padding: 7px 12px; font-size: .78rem; }
+.modal-row { display: flex; gap: 9px; justify-content: flex-end; margin-top: 16px; }
+
+/* ─── TOGGLE ─── */
+.toggle {
+  width: 42px; height: 24px; background: var(--border2);
+  border-radius: 12px; position: relative;
+  border: none; transition: var(--tr); flex-shrink: 0;
+}
+.toggle.on { background: var(--acc); }
+.tknob {
+  width: 18px; height: 18px; background: #fff;
+  border-radius: 50%; position: absolute;
+  top: 3px; left: 3px; transition: var(--tr);
+  box-shadow: 0 1px 3px rgba(0,0,0,.2);
+}
+.toggle.on .tknob { left: 21px; }
+
+/* ═══════════════════════════════════════════
+   CARDS
+═══════════════════════════════════════════ */
+.card {
+  background: var(--surface);
+  border-radius: var(--r);
+  border: 1px solid var(--border);
+  padding: 15px 16px;
+  margin-bottom: 10px;
+  transition: box-shadow var(--tr), border-color var(--tr), background var(--tr);
+}
+.card:hover { box-shadow: var(--sh); }
+.card-hdr {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; gap: 10px; margin-bottom: 8px;
+}
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 8px; border-radius: 20px;
+  font-size: .68rem; font-weight: 600;
+  letter-spacing: .04em; text-transform: uppercase;
+  white-space: nowrap;
+}
+.t-hurt   { background: var(--red-l);    color: var(--red-d);    }
+.t-annoy  { background: var(--amber-l);  color: var(--amber-d);  }
+.t-good   { background: var(--green-l);  color: var(--green-d);  }
+.t-need   { background: var(--blue-l);   color: var(--blue-d);   }
+.t-error  { background: var(--purple-l); color: var(--purple-d); }
+.t-crit   { background: var(--rose-l);   color: var(--rose-d);   }
+.t-agr    { background: var(--green-l);  color: var(--green-d);  }
+.t-pet    { background: var(--blue-l);   color: var(--blue-d);   }
+.t-mom    { background: var(--amber-l);  color: var(--amber-d);  }
+.t-dream  { background: var(--green-l);  color: var(--green-d);  }
+.t-date   { background: var(--purple-l); color: var(--purple-d); }
+.t-game   { background: var(--amber-l);  color: var(--amber-d);  }
+
+.card-txt { font-size: .91rem; color: var(--text1); line-height: 1.55; }
+.card-meta { font-size: .73rem; color: var(--text3); margin-top: 7px; }
+.card-author { font-size: .73rem; font-weight: 600; color: var(--text3); }
+.card-actions {
+  display: flex; gap: 7px; margin-top: 11px;
+  flex-wrap: wrap; align-items: center;
+}
+
+/* streak badge */
+.streak-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--amber-l); color: var(--amber-d);
+  padding: 3px 9px; border-radius: 20px;
+  font-size: .72rem; font-weight: 700;
+}
+.done-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--green-l); color: var(--green-d);
+  padding: 3px 9px; border-radius: 20px;
+  font-size: .72rem; font-weight: 700;
+}
+
+/* progress bar */
+.pbar { height: 7px; background: var(--bg2); border-radius: 10px; overflow: hidden; margin: 6px 0; }
+.pfill { height: 100%; border-radius: 10px; background: var(--acc); transition: width .6s ease; }
+
+/* ═══════════════════════════════════════════
+   SECTION HEADER
+═══════════════════════════════════════════ */
+.sh { margin-bottom: 16px; }
+.sh h2 {
+  font-family: var(--font-d);
+  font-size: 1.55rem; font-weight: 400;
+  color: var(--text1); letter-spacing: .01em;
+}
+.sh p { font-size: .84rem; color: var(--text2); margin-top: 3px; }
+
+/* ═══════════════════════════════════════════
+   TABS
+═══════════════════════════════════════════ */
+.tabs {
+  display: flex; gap: 0; background: var(--bg2);
+  border-radius: var(--r-s); padding: 3px;
+  margin-bottom: 14px; overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+.tabs::-webkit-scrollbar { display: none; }
+.tab {
+  flex: 0 0 auto; padding: 7px 13px;
+  border-radius: 7px;
+  font-size: .77rem; font-weight: 500; color: var(--text2);
+  transition: var(--tr); white-space: nowrap;
+}
+.tab.active {
+  background: var(--surface); color: var(--acc-d);
+  font-weight: 600; box-shadow: var(--sh);
+}
+
+/* ═══════════════════════════════════════════
+   HOME PAGE
+═══════════════════════════════════════════ */
+.home-hero {
+  padding: 20px 0 16px;
+  display: flex; align-items: center; gap: 14px;
+  margin-bottom: 18px;
+}
+.home-avatar-wrap {
+  position: relative; flex-shrink: 0;
+}
+.home-avatar {
+  width: 56px; height: 56px; border-radius: 50%;
+  background: var(--acc-l);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 28px;
+  border: 2.5px solid var(--acc);
+  box-shadow: 0 0 0 5px var(--acc-glow);
+}
+.home-text h2 {
+  font-family: var(--font-d);
+  font-size: 1.65rem; font-weight: 400;
+  line-height: 1.15;
+}
+.home-text p { font-size: .82rem; color: var(--text2); margin-top: 3px; }
+
+.phrase-card {
+  background: linear-gradient(135deg, var(--acc-l), var(--surface));
+  border: 1px solid var(--acc);
+  border-radius: var(--r);
+  padding: 16px 18px; margin-bottom: 16px;
+  position: relative; overflow: hidden;
+}
+.phrase-card::before {
+  content: '"';
+  font-family: var(--font-d); font-size: 6rem;
+  color: var(--acc); opacity: .12;
+  position: absolute; top: -20px; left: 10px;
+  line-height: 1;
+}
+.phrase-lbl {
+  font-size: .68rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: .1em;
+  color: var(--acc-d); margin-bottom: 5px;
+}
+.phrase-txt {
+  font-family: var(--font-d); font-style: italic;
+  font-size: 1rem; color: var(--text1); line-height: 1.6;
+  position: relative; z-index: 1;
+}
+.dark .phrase-card {
+  background: linear-gradient(135deg, rgba(232,119,138,.1), var(--surface));
+}
+.cesar.dark .phrase-card {
+  background: linear-gradient(135deg, rgba(212,168,50,.1), var(--surface));
+}
+.dark .phrase-txt  { color: var(--text1) !important; }
+.dark .phrase-lbl  { color: var(--acc)   !important; }
+
+/* All accent-gradient cards in dark mode */
+.dark .pet-card {
+  background: var(--surface2) !important;
+}
+.dark .pet-card .card-txt,
+.dark .pet-card .pet-sub p { color: var(--text1) !important; }
+
+/* Home petition card */
+.dark #home-pet .card {
+  background: var(--surface2) !important;
+}
+.dark #home-pet .card-txt { color: var(--text1) !important; }
+
+/* Agreement left-border card in dark */
+.dark .agr-card  { background: var(--surface) !important; }
+.dark .game-feature { background: var(--surface) !important; }
+.dark .spin-result  { background: var(--surface2) !important; color: var(--acc) !important; }
+
+.stats-row {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  gap: 8px; margin-bottom: 16px;
+}
+.stat {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 13px 8px; text-align: center;
+  transition: var(--tr);
+}
+.stat-n { font-size: 1.55rem; font-weight: 700; color: var(--acc-d); font-family: var(--font-d); }
+.stat-l { font-size: .64rem; color: var(--text3); margin-top: 2px; line-height: 1.3; }
+
+.qa-section h3 {
+  font-size: .72rem; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .08em;
+  margin-bottom: 10px;
+}
+.qa-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 16px; }
+.qa-btn {
+  background: var(--surface); border: 1.5px solid var(--border);
+  border-radius: var(--r); padding: 13px;
+  text-align: left; transition: var(--tr);
+  display: flex; flex-direction: column; gap: 3px;
+}
+.qa-btn:hover, .qa-btn:active {
+  border-color: var(--acc);
+  box-shadow: 0 0 0 3px var(--acc-glow);
+}
+.qa-icon { font-size: 20px; margin-bottom: 2px; }
+.qa-lbl  { font-size: .82rem; font-weight: 600; color: var(--text1); }
+.qa-desc { font-size: .68rem; color: var(--text3); }
+
+/* ═══════════════════════════════════════════
+   PETITION CARD
+═══════════════════════════════════════════ */
+.pet-card {
+  background: linear-gradient(135deg, var(--acc-l), var(--surface));
+  border: 1.5px solid var(--acc);
+}
+.pet-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 9px; border-radius: 20px;
+  font-size: .68rem; font-weight: 700;
+  background: var(--acc); color: #fff;
+}
+.pet-sub {
+  margin-top: 9px; padding: 9px 11px;
+  background: rgba(255,255,255,.55); border-radius: var(--r-s);
+}
+.dark .pet-sub { background: rgba(255,255,255,.06); }
+.pet-sub h4 { font-size: .73rem; font-weight: 700; color: var(--text2); margin-bottom: 3px; }
+.pet-sub p  { font-size: .88rem; color: var(--text1); }
+
+/* ═══════════════════════════════════════════
+   AGREEMENT CARD
+═══════════════════════════════════════════ */
+.agr-card { border-left: 3px solid var(--acc); }
+.agr-row  { display: flex; gap: 11px; align-items: flex-start; }
+.agr-num  {
+  width: 26px; height: 26px; border-radius: 50%;
+  background: var(--acc); color: #fff;
+  display: flex; align-items: center; justify-content: center;
+  font-size: .72rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+}
+
+/* ═══════════════════════════════════════════
+   DATE COUNTDOWN
+═══════════════════════════════════════════ */
+.cdown { font-size: .77rem; color: var(--text2); margin-top: 4px; }
+.cdown.today { color: var(--green-d); font-weight: 700; }
+.cdown.past  { color: var(--text3); }
+
+/* ═══════════════════════════════════════════
+   AI CHAT
+═══════════════════════════════════════════ */
+.chat-wrap {
+  display: flex; flex-direction: column;
+  height: calc(100vh - var(--hdr-h) - var(--nav-h) - 80px);
+  min-height: 300px;
+}
+.chat-msgs {
+  flex: 1; overflow-y: auto;
+  padding: 4px 0; display: flex; flex-direction: column; gap: 10px;
+}
+.cb {
+  max-width: 84%; padding: 11px 14px;
+  border-radius: 18px; font-size: .9rem; line-height: 1.56;
+  animation: bubbleIn .22s ease both;
+}
+@keyframes bubbleIn {
+  from { opacity:0; transform:scale(.95) translateY(4px); }
+  to   { opacity:1; transform:none; }
+}
+.cb.user {
+  align-self: flex-end; background: var(--acc); color: #fff;
+  border-bottom-right-radius: 4px;
+}
+.cb.ai {
+  align-self: flex-start; background: var(--surface);
+  color: var(--text1); border-bottom-left-radius: 4px;
+  border: 1px solid var(--border);
+}
+.chat-row {
+  display: flex; gap: 8px; padding: 10px 0; align-items: flex-end;
+}
+.chat-ta {
+  flex: 1; padding: 11px 14px; border-radius: 20px;
+  border: 1.5px solid var(--border); resize: none;
+  font-size: .9rem; color: var(--text1); background: var(--surface);
+  max-height: 88px; overflow-y: auto; outline: none;
+  transition: var(--tr);
+}
+.chat-ta:focus { border-color: var(--acc); box-shadow: 0 0 0 3px var(--acc-glow); }
+.chat-send {
+  width: 42px; height: 42px; border-radius: 50%;
+  background: var(--acc); color: #fff; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; transition: var(--tr);
+}
+.chat-send:hover { background: var(--acc-d); }
+.chat-send:disabled { opacity: .4; }
+.typing { display: flex; gap: 4px; align-items: center; padding: 11px 14px; }
+.tdot { width: 7px; height: 7px; border-radius: 50%; background: var(--text3); animation: bounce 1.1s infinite; }
+.tdot:nth-child(2) { animation-delay: .16s; }
+.tdot:nth-child(3) { animation-delay: .32s; }
+@keyframes bounce { 0%,100%{transform:translateY(0);}50%{transform:translateY(-5px);} }
+
+/* ═══════════════════════════════════════════
+   GAMES
+═══════════════════════════════════════════ */
+.game-feature {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); padding: 18px; margin-bottom: 10px;
+  text-align: center;
+}
+.game-feature h3 {
+  font-family: var(--font-d); font-size: 1.15rem;
+  font-weight: 400; margin-bottom: 6px;
+}
+.game-feature p { font-size: .84rem; color: var(--text2); margin-bottom: 14px; line-height: 1.5; }
+.spin-result {
+  font-family: var(--font-d); font-size: 1.1rem;
+  color: var(--acc-d); padding: 14px;
+  background: var(--acc-l); border-radius: var(--r);
+  margin-top: 12px; line-height: 1.55;
+  animation: resultIn .35s cubic-bezier(.34,1.56,.64,1) both;
+}
+@keyframes resultIn {
+  from { opacity:0; transform:scale(.9); }
+  to   { opacity:1; transform:none; }
+}
+.diff-e { background: var(--green-l); color: var(--green-d); }
+.diff-m { background: var(--amber-l); color: var(--amber-d); }
+.diff-h { background: var(--red-l);   color: var(--red-d);   }
+
+/* ═══════════════════════════════════════════
+   SETTINGS
+═══════════════════════════════════════════ */
+.set-section { margin-bottom: 22px; }
+.set-section-title {
+  font-size: .68rem; font-weight: 700; color: var(--text3);
+  text-transform: uppercase; letter-spacing: .1em;
+  padding: 0 2px; margin-bottom: 4px;
+}
+.set-group {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r); overflow: hidden;
+}
+.set-row {
+  display: flex; align-items: center;
+  justify-content: space-between; gap: 12px;
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  transition: background var(--tr);
+}
+.set-row:last-child { border-bottom: none; }
+.set-row-left { flex: 1; }
+.set-lbl  { font-size: .88rem; color: var(--text1); font-weight: 500; }
+.set-desc { font-size: .75rem; color: var(--text3); margin-top: 2px; }
+
+/* ═══════════════════════════════════════════
+   EMPTY STATE
+═══════════════════════════════════════════ */
+.empty {
+  text-align: center; padding: 36px 20px; color: var(--text2);
+}
+.empty-icon { font-size: 36px; margin-bottom: 10px; }
+.empty p { font-size: .86rem; line-height: 1.55; }
+
+/* ═══════════════════════════════════════════
+   PRIVATE SECTION HEADER
+═══════════════════════════════════════════ */
+.priv-note {
+  font-size: .78rem; color: var(--purple-d);
+  background: var(--purple-l); border-radius: var(--r-s);
+  padding: 8px 11px; margin-bottom: 12px; display: none;
+}
+
+/* ── EMOTION CHIPS ── */
+.emo-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.emo-chip {
+  padding: 5px 11px; border-radius: 20px; font-size: .8rem;
+  border: 1.5px solid var(--border); cursor: pointer;
+  transition: var(--tr); background: var(--bg);
+  color: var(--text2);
+}
+.emo-chip.sel { border-color: var(--acc); background: var(--acc-l); color: var(--acc-d); font-weight: 600; }
+
+/* ── SUPERADO BADGE ── */
+.superado {
+  display: inline-flex; align-items: center; gap: 4px;
+  background: var(--green-l); color: var(--green-d);
+  padding: 3px 8px; border-radius: 20px;
+  font-size: .7rem; font-weight: 700;
+}
+
+.dvdr { height: 1px; background: var(--border); margin: 14px 0; }
+
+/* Dark mode: ensure all accent-l gradient backgrounds are opaque */
+.dark .card { background: var(--surface); }
+.dark .card.agr-card { background: var(--surface) !important; }
+
+/* ── DARK TOGGLE TRANSITION ── */
+body, .hdr, .bnav, .card, .modal, .set-group, .more-panel {
+  transition: background var(--tr), border-color var(--tr), color var(--tr);
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════ SPLASH ═══════════ -->
+<div id="splash">
+  <div class="splash-stars" id="stars"></div>
+
+  <div id="profile-select" style="display:flex;flex-direction:column;align-items:center;gap:24px;width:100%;max-width:320px">
+    <div>
+      <div class="splash-logo">ELyLE</div>
+      <div class="splash-sub">entre la luna y las estrellas</div>
+    </div>
+    <div class="profile-row">
+      <button class="profile-btn" onclick="selectProfile('andrea')">
+        <div class="profile-icon">🌙</div>
+        <div class="profile-name">Andrea</div>
+        <div class="profile-hint">perfil privado</div>
+      </button>
+      <button class="profile-btn" onclick="selectProfile('cesar')">
+        <div class="profile-icon">✨</div>
+        <div class="profile-name">César</div>
+        <div class="profile-hint">perfil privado</div>
+      </button>
+    </div>
+    <button class="setup-btn" onclick="openCfg()" style="color:rgba(255,255,255,.3);font-size:.75rem;background:none;border:none;cursor:pointer;font-family:var(--font-b)">⚙ configuración</button>
+  </div>
+
+  <div id="pin-screen">
+    <div class="pin-title" id="pin-title">Hola, Andrea 🌙</div>
+    <div class="pin-sub">Ingresa tu PIN de 4 dígitos</div>
+    <div class="pin-dots" id="pin-dots">
+      <div class="pin-dot" id="pd0"></div>
+      <div class="pin-dot" id="pd1"></div>
+      <div class="pin-dot" id="pd2"></div>
+      <div class="pin-dot" id="pd3"></div>
+    </div>
+    <div class="pin-numpad">
+      <button class="pin-key" onclick="pinKey('1')">1</button>
+      <button class="pin-key" onclick="pinKey('2')">2</button>
+      <button class="pin-key" onclick="pinKey('3')">3</button>
+      <button class="pin-key" onclick="pinKey('4')">4</button>
+      <button class="pin-key" onclick="pinKey('5')">5</button>
+      <button class="pin-key" onclick="pinKey('6')">6</button>
+      <button class="pin-key" onclick="pinKey('7')">7</button>
+      <button class="pin-key" onclick="pinKey('8')">8</button>
+      <button class="pin-key" onclick="pinKey('9')">9</button>
+      <button class="pin-key wide" onclick="pinFirst()">← cambiar</button>
+      <button class="pin-key" onclick="pinKey('0')">0</button>
+      <button class="pin-key del" onclick="pinDel()">⌫</button>
+    </div>
+    <div class="pin-err" id="pin-err"></div>
+  </div>
+</div>
+
+<!-- ═══════════ SETUP MODAL ═══════════ -->
+<div class="ov" id="ov-cfg">
+  <div class="modal">
+    <div class="modal-pill" onclick="closeCfg()"></div>
+    <h3>Configuración ⚙️</h3>
+    <div class="fg"><label>Google Apps Script URL</label>
+      <input class="fi" id="cfg-script" placeholder="https://script.google.com/macros/s/…"></div>
+    <div class="fg"><label>Clave API Anthropic (Claude)</label>
+      <input class="fi" id="cfg-key" type="password" placeholder="sk-ant-…"></div>
+    <div class="fg" id="pin-andrea-row"><label>Mi PIN — Andrea 🌙 (4 dígitos)</label>
+      <input class="fi" id="cfg-pin1" type="password" maxlength="4" placeholder="Nuevo PIN" inputmode="numeric"></div>
+    <div class="fg" id="pin-cesar-row"><label>Mi PIN — César ✨ (4 dígitos)</label>
+      <input class="fi" id="cfg-pin2" type="password" maxlength="4" placeholder="Nuevo PIN" inputmode="numeric"></div>
+    <div class="modal-row">
+      <button class="btn btn-s" onclick="closeCfg()">Cancelar</button>
+      <button class="btn btn-p" onclick="saveCfg()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ ADD ENTRY MODAL ═══════════ -->
+<div class="ov" id="ov-add">
+  <div class="modal">
+    <div class="modal-pill" onclick="closeAdd()"></div>
+    <h3 id="add-title">Nueva entrada</h3>
+    <div class="fg"><label>Tipo</label>
+      <select class="fsel" id="e-type" onchange="onTypeChange()">
+        <option value="hurt">💔 Me hiere</option>
+        <option value="annoy">😤 Me molesta</option>
+        <option value="good">💚 Me hace bien</option>
+        <option value="need">🫂 Necesito</option>
+        <option value="petition">🙏 Petición</option>
+        <option value="agreement">🤝 Acuerdo</option>
+        <option value="error">🔮 Error del pasado</option>
+        <option value="critique">🪞 Autocrítica</option>
+        <option value="moment">✨ Momento bonito</option>
+        <option value="dream">🌟 Sueño / meta</option>
+        <option value="date">📅 Fecha especial</option>
+      </select>
+    </div>
+    <div class="priv-note" id="priv-note">🔒 Solo visible para ti</div>
+    <div class="fg" id="title-row" style="display:none">
+      <label>Título del momento</label>
+      <input class="fi" id="e-title" placeholder="Ej: Nuestra primera cita…" maxlength="60">
+    </div>
+    <div class="fg"><label id="e-lbl">Descripción</label>
+      <textarea class="fta" id="e-text" placeholder="Escribe aquí…"></textarea></div>
+    <!-- Petition extra -->
+    <div id="pet-extra" style="display:none">
+      <div class="fg"><label>¿Qué dificulta cumplirlo?</label>
+        <textarea class="fta" id="e-diff" placeholder="Obstáculos…"></textarea></div>
+      <div class="fg"><label>¿Qué ayudaría?</label>
+        <textarea class="fta" id="e-help" placeholder="Lo que necesitaría…"></textarea></div>
+    </div>
+    <!-- Error extra fields -->
+    <div id="emo-extra" style="display:none">
+      <div class="fg" id="aspecto-row" style="display:none">
+        <label>Aspecto a mejorar</label>
+        <input class="fi" id="e-aspecto" placeholder="Ej: paciencia, comunicación, confianza…">
+      </div>
+      <div class="fg"><label id="wished-lbl">¿Qué te hubiera gustado?</label>
+        <textarea class="fta" id="e-wished" placeholder="Lo que hubiera preferido…"></textarea></div>
+    </div>
+    <!-- Moment date (past dates allowed) -->
+    <div id="moment-date-row" style="display:none" class="fg">
+      <label>Fecha del momento <span style="font-weight:400;text-transform:none;font-size:.75rem;color:var(--text3)">(opcional)</span></label>
+      <input type="date" class="fi" id="e-moment-date">
+    </div>
+    <!-- Date event (future) -->
+    <div id="date-extra" style="display:none" class="fg"><label>Fecha del evento</label>
+      <input type="date" class="fi" id="e-date"></div>
+    <!-- Dream progress -->
+    <div id="prog-extra" style="display:none" class="fg">
+      <label>Progreso: <span id="pv">0</span>%</label>
+      <input type="range" id="e-prog" min="0" max="100" value="0"
+        oninput="document.getElementById('pv').textContent=this.value"
+        style="width:100%;margin-top:6px;accent-color:var(--acc)">
+    </div>
+    <div class="modal-row">
+      <button class="btn btn-s" onclick="closeAdd()">Cancelar</button>
+      <button class="btn btn-p" onclick="saveEntry()">Guardar</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ CUSTOM RETO MODAL ═══════════ -->
+<div class="ov" id="ov-reto">
+  <div class="modal">
+    <div class="modal-pill" onclick="closeRetoModal()"></div>
+    <h3>Nuevo reto 🏆</h3>
+    <div style="display:flex;gap:8px;margin-bottom:14px">
+      <button class="btn btn-s" id="reto-tab-random" onclick="retoTab('random')" style="flex:1;justify-content:center;font-size:.82rem">🎲 Sugerido</button>
+      <button class="btn btn-p" id="reto-tab-custom" onclick="retoTab('custom')" style="flex:1;justify-content:center;font-size:.82rem">✏️ Personalizado</button>
+    </div>
+    <!-- Random panel -->
+    <div id="reto-random-panel">
+      <div id="reto-suggestion" style="min-height:60px;padding:12px;background:var(--bg2);border-radius:var(--r-s);font-size:.92rem;color:var(--text1);line-height:1.5;margin-bottom:12px"></div>
+      <button class="btn btn-s btn-f" onclick="shuffleSuggestion()" style="margin-bottom:4px">🔀 Otra sugerencia</button>
+    </div>
+    <!-- Custom panel -->
+    <div id="reto-custom-panel" style="display:none">
+      <div class="fg">
+        <label>Describe el reto</label>
+        <textarea class="fta" id="reto-custom-text" placeholder="Ej: Cocinar juntos algo que nunca hayan probado…" style="min-height:90px"></textarea>
+      </div>
+    </div>
+    <div class="fg" style="margin-top:10px">
+      <label>Dificultad</label>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button class="btn reto-diff-btn" id="rd-e" onclick="selDiff('e')" style="flex:1;justify-content:center;font-size:.8rem;background:var(--green-l);color:var(--green-d);border:1.5px solid transparent">🟢 Fácil</button>
+        <button class="btn reto-diff-btn" id="rd-m" onclick="selDiff('m')" style="flex:1;justify-content:center;font-size:.8rem;background:var(--amber-l);color:var(--amber-d);border:1.5px solid transparent">🟡 Medio</button>
+        <button class="btn reto-diff-btn" id="rd-h" onclick="selDiff('h')" style="flex:1;justify-content:center;font-size:.8rem;background:var(--red-l);color:var(--red-d);border:1.5px solid transparent">🔴 Difícil</button>
+      </div>
+    </div>
+    <div class="modal-row">
+      <button class="btn btn-s" onclick="closeRetoModal()">Cancelar</button>
+      <button class="btn btn-p" onclick="saveReto()">Añadir reto</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ TOAST ═══════════ -->
+<div id="toast"></div>
+
+<!-- ═══════════ MORE SIDE MENU ═══════════ -->
+<div class="more-sheet" id="more-sheet">
+  <div class="more-backdrop" onclick="closeMore()"></div>
+  <div class="more-panel">
+    <div class="more-header">
+      <h3>Menú</h3>
+    </div>
+    <div class="more-item" onclick="navTo('private');closeMore()">
+      <span class="mi-icon">🔒</span>
+      <span class="mi-label">Solo mío</span>
+      <span class="mi-arrow">›</span>
+    </div>
+    <div class="more-item" onclick="navTo('games');closeMore()">
+      <span class="mi-icon">🎮</span>
+      <span class="mi-label">Juegos & Retos</span>
+      <span class="mi-arrow">›</span>
+    </div>
+    <div class="more-item" onclick="navTo('chat');closeMore()">
+      <span class="mi-icon">🧠</span>
+      <span class="mi-label">Terapia IA</span>
+      <span class="mi-arrow">›</span>
+    </div>
+    <div class="more-item" onclick="navTo('settings');closeMore()">
+      <span class="mi-icon">⚙️</span>
+      <span class="mi-label">Ajustes</span>
+      <span class="mi-arrow">›</span>
+    </div>
+    <div class="more-item" onclick="logout();closeMore()">
+      <span class="mi-icon">👋</span>
+      <span class="mi-label">Cerrar sesión</span>
+      <span class="mi-arrow">›</span>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════ APP ═══════════ -->
+<div id="app">
+  <header class="hdr">
+    <div class="hdr-brand">ELyLE</div>
+    <div class="hdr-user">
+      <div class="hdr-avatar" id="hdr-av">🌙</div>
+      <span class="hdr-name" id="hdr-name">Andrea</span>
+    </div>
+    <button class="hdr-menu-btn" onclick="openMore()">☰</button>
+  </header>
+
+  <main class="content">
+
+    <!-- HOME -->
+    <div class="page active" id="page-home">
+      <div class="home-hero">
+        <div class="home-avatar-wrap">
+          <div class="home-avatar" id="home-av">🌙</div>
+        </div>
+        <div class="home-text">
+          <h2>Hola, <span id="gr-name">Andrea</span></h2>
+          <p id="gr-date"></p>
+        </div>
+      </div>
+      <div class="phrase-card">
+        <div class="phrase-lbl">💌 Frase del día</div>
+        <div class="phrase-txt" id="daily-phrase">…</div>
+      </div>
+      <div class="stats-row" id="stats-row"></div>
+      <div class="qa-section">
+        <h3>Acciones rápidas</h3>
+        <div class="qa-grid">
+          <button class="qa-btn" onclick="openAdd('hurt')"><span class="qa-icon">💔</span><span class="qa-lbl">Me hiere</span><span class="qa-desc">Algo que duele</span></button>
+          <button class="qa-btn" onclick="openAdd('good')"><span class="qa-icon">💚</span><span class="qa-lbl">Me hace bien</span><span class="qa-desc">Gracias por esto</span></button>
+          <button class="qa-btn" onclick="openAdd('need')"><span class="qa-icon">🫂</span><span class="qa-lbl">Necesito</span><span class="qa-desc">Ahora mismo</span></button>
+          <button class="qa-btn" onclick="openAdd('moment')"><span class="qa-icon">✨</span><span class="qa-lbl">Momento bonito</span><span class="qa-desc">Un recuerdo</span></button>
+        </div>
+      </div>
+      <div id="home-pet"></div>
+    </div>
+
+    <!-- FEELINGS -->
+    <div class="page" id="page-feelings">
+      <div class="sh"><h2>Sentimientos</h2><p>Lo que queremos que sepa el otro</p></div>
+      <div class="tabs">
+        <button class="tab active" onclick="fTab('all',this)">Todo</button>
+        <button class="tab" onclick="fTab('hurt',this)">💔 Hiere</button>
+        <button class="tab" onclick="fTab('annoy',this)">😤 Molesta</button>
+        <button class="tab" onclick="fTab('good',this)">💚 Bien</button>
+        <button class="tab" onclick="fTab('need',this)">🫂 Necesito</button>
+      </div>
+      <div id="list-feelings"></div>
+    </div>
+
+    <!-- AGREEMENTS -->
+    <div class="page" id="page-agreements">
+      <div class="sh"><h2>Acuerdos</h2><p>Las reglas de amor que construimos juntos</p></div>
+      <div class="tabs">
+        <button class="tab active" onclick="agrTab('petition',this)">🙏 Petición</button>
+        <button class="tab" onclick="agrTab('agreement',this)">🤝 Acuerdos</button>
+        <button class="tab" onclick="agrTab('done',this)">✅ Logrados</button>
+      </div>
+      <div id="list-agreements"></div>
+    </div>
+
+    <!-- TOGETHER -->
+    <div class="page" id="page-together">
+      <div class="sh"><h2>Juntos</h2><p>Momentos, sueños y fechas especiales</p></div>
+      <div class="tabs">
+        <button class="tab active" onclick="tTab('all',this)">Todo</button>
+        <button class="tab" onclick="tTab('moment',this)">✨ Momentos</button>
+        <button class="tab" onclick="tTab('dream',this)">🌟 Sueños</button>
+        <button class="tab" onclick="tTab('date',this)">📅 Fechas</button>
+      </div>
+      <div id="together-search" style="display:none;margin-bottom:12px">
+        <input class="fi" id="moment-search" placeholder="🔍 Buscar momentos…"
+          oninput="renderTogether()" style="border-radius:30px;padding:10px 16px">
+      </div>
+      <div id="list-together"></div>
+    </div>
+
+    <!-- PRIVATE (solo mío) -->
+    <div class="page" id="page-private">
+      <div class="sh"><h2>Solo mío 🔒</h2><p>Espacio personal — solo visible para ti</p></div>
+      <div class="tabs">
+        <button class="tab active" onclick="prTab('all',this)">Todo</button>
+        <button class="tab" onclick="prTab('error',this)">🔮 Errores</button>
+        <button class="tab" onclick="prTab('critique',this)">🪞 Autocrítica</button>
+      </div>
+      <div id="list-private"></div>
+    </div>
+
+    <!-- GAMES -->
+    <div class="page" id="page-games">
+      <div class="sh"><h2>Juegos & Retos 🎮</h2><p>Conéctense jugando</p></div>
+      <div class="tabs">
+        <button class="tab active" onclick="gTab('all',this)">Todo</button>
+        <button class="tab" onclick="gTab('spin',this)">🎰 Ruleta</button>
+        <button class="tab" onclick="gTab('reto',this)">🏆 Retos</button>
+        <button class="tab" onclick="gTab('preg',this)">❓ Preguntas</button>
+      </div>
+      <div id="games-content"></div>
+    </div>
+
+    <!-- AI CHAT -->
+    <div class="page" id="page-chat">
+      <div class="sh"><h2>Terapia IA 🧠</h2><p>Tu espacio seguro</p></div>
+      <div class="chat-wrap">
+        <div class="chat-msgs" id="chat-msgs"></div>
+        <div class="chat-row">
+          <textarea class="chat-ta" id="chat-in" placeholder="¿Cómo te sientes hoy?…" rows="1"
+            onkeydown="chatKey(event)" oninput="autoH(this)"></textarea>
+          <button class="chat-send" id="chat-btn" onclick="sendChat()">➤</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- SETTINGS -->
+    <div class="page" id="page-settings">
+      <div class="sh"><h2>Ajustes</h2></div>
+
+      <div class="set-section">
+        <div class="set-section-title">Apariencia</div>
+        <div class="set-group">
+          <div class="set-row">
+            <div class="set-row-left"><div class="set-lbl">Modo oscuro</div><div class="set-desc">Tema nocturno para los ojos</div></div>
+            <button class="toggle" id="tog-dark" onclick="togDark(this)"><div class="tknob"></div></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="set-section">
+        <div class="set-section-title">Seguridad</div>
+        <div class="set-group">
+          <div class="set-row">
+            <div class="set-row-left"><div class="set-lbl">Cambiar PINs</div><div class="set-desc">Modifica los PINs de acceso</div></div>
+            <button class="btn btn-s btn-sm" onclick="openCfg()">Cambiar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="set-section">
+        <div class="set-section-title">Notificaciones</div>
+        <div class="set-group">
+          <div class="set-row">
+            <div class="set-row-left"><div class="set-lbl">Recordatorios</div><div class="set-desc">Frases positivas durante el día</div></div>
+            <button class="toggle on" id="tog-notif" onclick="togSet('notif',this)"><div class="tknob"></div></button>
+          </div>
+          <div class="set-row">
+            <div class="set-row-left"><div class="set-lbl">Push nativo</div><div class="set-desc">Notificaciones del sistema</div></div>
+            <button class="btn btn-s btn-sm" onclick="reqPush()">Activar</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="set-section">
+        <div class="set-section-title">Sincronización</div>
+        <div class="set-group">
+          <div class="set-row">
+            <div class="set-row-left"><div class="set-lbl">Google Sheets</div><div class="set-desc" id="cfg-show">No configurado</div></div>
+            <button class="btn btn-s btn-sm" onclick="openCfg()">Editar</button>
+          </div>
+          <div class="set-row">
+            <div class="set-row-left"><div class="set-lbl">Sincronizar</div><div class="set-desc">Última: <span id="last-sync">Nunca</span></div></div>
+            <button class="btn btn-p btn-sm" onclick="syncNow()">🔄 Sync</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="set-section">
+        <div class="set-section-title">Datos</div>
+        <div class="set-group">
+          <div class="set-row">
+            <div class="set-row-left"><div class="set-lbl">Exportar mis datos</div></div>
+            <button class="btn btn-s btn-sm" onclick="exportData()">Exportar</button>
+          </div>
+          <div class="set-row">
+            <div class="set-row-left"><div class="set-lbl" style="color:var(--red-d)">Borrar mis datos</div></div>
+            <button class="btn btn-d btn-sm" onclick="clearData()">Borrar</button>
+          </div>
+        </div>
+      </div>
+
+      <div style="text-align:center;padding:20px 0 8px;color:var(--text3)">
+        <div style="font-family:var(--font-d);font-size:1.1rem;color:var(--text2)">ELyLE</div>
+        <div style="font-size:.72rem;margin-top:3px">entre la luna y las estrellas · v3.0</div>
+        <div style="font-size:.7rem;margin-top:2px">Lima, Perú 🇵🇪</div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- BOTTOM NAV — 4 items -->
+  <nav class="bnav">
+    <button class="ni active" onclick="navTo('home',this)">
+      <span class="ni-icon">🏠</span><span>Inicio</span>
+    </button>
+    <button class="ni" onclick="navTo('feelings',this)">
+      <span class="ni-icon">💬</span><span>Sentir</span>
+      <div class="ni-dot" id="dot-feelings"></div>
+    </button>
+    <button class="ni" onclick="navTo('agreements',this)">
+      <span class="ni-icon">🤝</span><span>Acuerdos</span>
+    </button>
+    <button class="ni" onclick="navTo('together',this)">
+      <span class="ni-icon">🌟</span><span>Juntos</span>
+    </button>
+    <button class="ni" onclick="openMore()">
+      <span class="ni-icon">⋯</span><span>Más</span>
+    </button>
+  </nav>
+
+  <button class="fab" id="fab" onclick="fabAction()">+</button>
+</div>
+
+<script>
+// ════════════════════════════════════════════════
+// ACCESS GUARD — WebView only
+// ════════════════════════════════════════════════
+(function() {
+  const REQUIRED_UA    = 'ELyLE-App';          // must appear in User-Agent
+  const REQUIRED_TOKEN = 'elyle_2024_secure';  // ?token= in URL  ← CÁMBIALO
+
+  const uaOk    = navigator.userAgent.includes(REQUIRED_UA);
+  const params  = new URLSearchParams(window.location.search);
+  const tokenOk = params.get('token') === REQUIRED_TOKEN;
+
+  if (!uaOk && !tokenOk) {
+    document.documentElement.innerHTML = `
+      <html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+      <style>*{margin:0;padding:0;box-sizing:border-box;}
+      body{display:flex;flex-direction:column;align-items:center;justify-content:center;
+           min-height:100vh;background:#0f0e14;font-family:sans-serif;color:rgba(255,255,255,.3);
+           text-align:center;padding:32px;gap:12px;}
+      .big{font-size:48px;}.msg{font-size:.9rem;line-height:1.6;max-width:280px;}
+      </style></head>
+      <body><div class="big">💝</div>
+      <div class="msg">Esta app solo está disponible<br>desde la aplicación móvil ELyLE.</div>
+      </body></html>`;
+    throw new Error('Access denied');
+  }
+})();
+
+// ════════════════════════════════════════════════
+// CONSTANTS & STATE
+// ════════════════════════════════════════════════
+const CFG_KEY = 'elyle_cfg';
+const DB_KEY  = 'elyle_db';
+const CH_KEY  = 'elyle_challenges';
+
+let ME = null;
+let cfg = {
+  scriptUrl: '', claudeKey: '',
+  pin_andrea: '0000', pin_cesar: '0000',
+  notif: true, dark: false
+};
+let db = { andrea:[], cesar:[] };
+let challenges = [];
+let chatHist = [];
+let notifTimer = null;
+let selectedEmotions = [];
+let curPage = 'home';
+let curAgrTab = 'petition';
+let pendingUser = null;
+let pinBuffer = '';
+
+// ─── FILTER STATE ─────────────────────────────
+let fF = 'all', prF = 'all', tF = 'all', gF = 'all';
+
+// ─── EMOTIONS ─────────────────────────────────
+const EMOTIONS = ['😔 Triste','😡 Enojado/a','😰 Ansioso/a','😞 Decepcionado/a',
+  '😟 Preocupado/a','🫥 Ignorado/a','😭 Herido/a','😤 Frustrado/a',
+  '🥺 Vulnerable','😶 Silenciado/a','😮 Sorprendido/a','😕 Confundido/a'];
+
+// ─── PHRASES ──────────────────────────────────
+const PHRASES = [
+  "El amor verdadero crece cuando ambos eligen quedarse y trabajar juntos cada día.",
+  "Ser vulnerables el uno con el otro es la forma más valiente de amar.",
+  "Cada conversación difícil que tienen es un puente hacia mayor intimidad.",
+  "No busquen la pareja perfecta — sean la pareja perfecta el uno para el otro.",
+  "El amor no es mirarse el uno al otro, es mirar juntos en la misma dirección.",
+  "Crecer juntos es el más hermoso de todos los proyectos de vida.",
+  "En la tormenta y en la calma, tú eres mi hogar.",
+  "Los pequeños momentos cotidianos son donde vive el amor verdadero.",
+  "Sanar juntos es más valiente que sanar solos.",
+  "Sus diferencias no los separan, los complementan perfectamente.",
+  "Cada 'lo siento' genuino construye una confianza que dura toda la vida.",
+  "El amor que construyen hoy es la seguridad que necesitan mañana.",
+  "Elegirse cada mañana es el acto de amor más poderoso que existe.",
+  "La paciencia con el otro es también paciencia con el amor que construyen.",
+  "Juntos son más valientes, más fuertes, más completos. 💝"
+];
+
+const TAGS = {
+  hurt:{lbl:'Me hiere',cls:'t-hurt',icon:'💔'}, annoy:{lbl:'Me molesta',cls:'t-annoy',icon:'😤'},
+  good:{lbl:'Me hace bien',cls:'t-good',icon:'💚'}, need:{lbl:'Necesito',cls:'t-need',icon:'🫂'},
+  error:{lbl:'Error pasado',cls:'t-error',icon:'🔮'}, critique:{lbl:'Autocrítica',cls:'t-crit',icon:'🪞'},
+  agreement:{lbl:'Acuerdo',cls:'t-agr',icon:'🤝'}, petition:{lbl:'Petición',cls:'t-pet',icon:'🙏'},
+  moment:{lbl:'Momento bonito',cls:'t-mom',icon:'✨'}, dream:{lbl:'Sueño/meta',cls:'t-dream',icon:'🌟'},
+  date:{lbl:'Fecha especial',cls:'t-date',icon:'📅'},
+};
+
+const FAB_TYPE = {
+  home:'hurt', feelings:'hurt', agreements:'agreement',
+  together:'moment', private:'error', games:'moment',
+  chat:null, settings:null
+};
+
+const RETOS = [
+  {text:"Cocinen juntos una receta nueva que ninguno haya probado",diff:"e"},
+  {text:"Pasen 1 hora sin teléfono, solo conversando",diff:"e"},
+  {text:"Escríbanse una carta de amor a mano",diff:"m"},
+  {text:"Hagan un picnic con sus comidas favoritas",diff:"e"},
+  {text:"Tomen una clase juntos (baile, yoga, arte…)",diff:"m"},
+  {text:"Planifiquen un viaje soñado aunque sea solo el plan",diff:"e"},
+  {text:"Digan 5 cosas que admiran del otro sin interrupción",diff:"e"},
+  {text:"Sorpréndanse mutuamente con algo inesperado hoy",diff:"m"},
+  {text:"Vean una película nueva y discútanla después",diff:"e"},
+  {text:"Mediten juntos 10 minutos en silencio",diff:"m"},
+  {text:"Tómense fotos en 3 lugares especiales para ustedes",diff:"h"},
+  {text:"Intercambien playlists de 10 canciones que los representen",diff:"e"},
+  {text:"Hagan un bucket list de pareja con 20 cosas",diff:"h"},
+  {text:"Dense un masaje de 15 minutos cada uno",diff:"m"},
+  {text:"Cuéntense el mejor recuerdo que tienen el uno del otro",diff:"e"},
+];
+const PREGUNTAS = [
+  "¿Cuál es el momento exacto en que supiste que era especial para ti?",
+  "Si pudiéramos vivir en cualquier ciudad del mundo, ¿cuál elegirías?",
+  "¿Qué es lo primero que piensas cuando te despiertas junto a mí?",
+  "¿Cuál es el gesto pequeño que más te hace sentir amado/a?",
+  "¿Qué sueño personal tuyo quisiera que apoyara más?",
+  "Si pudieras cambiar una cosa de cómo me comunico contigo, ¿qué sería?",
+  "¿Cuál es tu recuerdo favorito de nosotros?",
+  "¿Cómo imaginas nuestra vida juntos en 5 años?",
+  "¿Hay algo que nunca te he dicho y que crees que debería saber?",
+  "¿Qué es lo que más te gusta de nuestra relación?",
+  "¿En qué momento te sientes más conectado/a conmigo?",
+  "¿Qué tradición de pareja te gustaría que creáramos?",
+  "¿Qué significa para ti el hogar, y cómo encajo yo en eso?",
+  "Si pudieras revivir un día perfecto juntos, ¿cuál sería?",
+  "¿Qué te gustaría que hiciera más seguido?",
+];
+const RULETA = [
+  "💆 Masaje de espalda por 10 minutos",
+  "🍫 El otro elige el postre esta semana",
+  "🎬 Noche de película: el otro elige sin veto",
+  "💌 Escríbeme una nota de amor ahora mismo",
+  "🍳 Te preparo el desayuno favorito mañana",
+  "🕺 Baile improvisado — ¡ahora!",
+  "📸 Sesión de fotos juntos en casa",
+  "🧸 Abrazo de 60 segundos sin interrupciones",
+  "🎵 Ponme tu canción favorita del momento",
+  "🌹 Dime 3 cosas que admiras de mí",
+  "☕ Te traigo tu bebida favorita",
+  "🎮 Tú eliges el plan del próximo fin de semana",
+  "💬 Cuéntame algo que no te he preguntado nunca",
+  "🌙 Salida sorpresa esta semana — tú organizas",
+  "🤫 Cuéntame un secreto tonto que no sepa",
+];
+
+// ════════════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════════════
+function init() {
+  const sc = localStorage.getItem(CFG_KEY);
+  if (sc) cfg = {...cfg, ...JSON.parse(sc)};
+  const sd = localStorage.getItem(DB_KEY);
+  if (sd) db = JSON.parse(sd);
+  const ch = localStorage.getItem(CH_KEY);
+  if (ch) challenges = JSON.parse(ch);
+  applyDark(cfg.dark);
+  buildStars();
+  updateCfgShow();
+  if (cfg.dark) document.getElementById('tog-dark')?.classList.add('on');
+  if (!cfg.notif) document.getElementById('tog-notif')?.classList.remove('on');
+}
+
+// ════════════════════════════════════════════════
+// STARS (splash decoration)
+// ════════════════════════════════════════════════
+function buildStars() {
+  const c = document.getElementById('stars'); if (!c) return;
+  for (let i=0;i<70;i++) {
+    const s = document.createElement('div');
+    s.className = 'star';
+    const sz = Math.random()*2+1;
+    s.style.cssText = `width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;
+      --op:${Math.random()*.5+.1};--d:${Math.random()*4+2}s;--delay:${Math.random()*3}s`;
+    c.appendChild(s);
+  }
+}
+
+// ════════════════════════════════════════════════
+// PIN / AUTH
+// ════════════════════════════════════════════════
+function selectProfile(user) {
+  pendingUser = user;
+  pinBuffer = '';
+  document.getElementById('profile-select').style.display = 'none';
+  const ps = document.getElementById('pin-screen');
+  ps.classList.add('active');
+  const isA = user === 'andrea';
+  document.getElementById('pin-title').textContent = `Hola, ${isA ? 'Andrea 🌙' : 'César ✨'}`;
+  // Set acc color for pin dots
+  document.documentElement.style.setProperty('--acc', isA ? 'var(--rose)' : 'var(--gold)');
+  document.getElementById('pin-err').textContent = '';
+  updatePinDots();
+}
+function pinFirst() {
+  document.getElementById('pin-screen').classList.remove('active');
+  document.getElementById('profile-select').style.display = 'flex';
+  pinBuffer = '';
+  document.documentElement.style.setProperty('--acc', 'var(--rose)');
+}
+function pinKey(k) {
+  if (pinBuffer.length >= 4) return;
+  pinBuffer += k;
+  updatePinDots();
+  if (pinBuffer.length === 4) setTimeout(checkPin, 80);
+}
+function pinDel() {
+  pinBuffer = pinBuffer.slice(0,-1);
+  updatePinDots();
+  document.getElementById('pin-err').textContent = '';
+}
+function updatePinDots() {
+  for (let i=0;i<4;i++) {
+    document.getElementById('pd'+i).classList.toggle('filled', i < pinBuffer.length);
+  }
+}
+function checkPin() {
+  const expected = pendingUser === 'andrea' ? cfg.pin_andrea : cfg.pin_cesar;
+  if (pinBuffer === expected) {
+    loginUser(pendingUser);
+  } else {
+    document.getElementById('pin-err').textContent = 'PIN incorrecto, inténtalo de nuevo';
+    pinBuffer = '';
+    updatePinDots();
+  }
+}
+function loginUser(user) {
+  ME = user;
+  const isA = user === 'andrea';
+  document.body.className = (isA ? 'andrea' : 'cesar') + (cfg.dark ? ' dark' : '');
+  document.documentElement.style.setProperty('--acc',   isA ? 'var(--rose)'   : 'var(--gold)');
+  document.documentElement.style.setProperty('--acc-l', isA ? 'var(--rose-l)' : 'var(--gold-l)');
+  document.documentElement.style.setProperty('--acc-d', isA ? 'var(--rose-d)' : 'var(--gold-d)');
+  document.documentElement.style.setProperty('--acc-glow', isA ? 'var(--rose-glow)' : 'var(--gold-glow)');
+  const icon = isA ? '🌙' : '✨';
+  const name = isA ? 'Andrea' : 'César';
+  document.getElementById('hdr-av').textContent   = icon;
+  document.getElementById('home-av').textContent  = icon;
+  document.getElementById('hdr-name').textContent = name;
+  document.getElementById('gr-name').textContent  = name;
+  document.getElementById('gr-date').textContent  =
+    new Date().toLocaleDateString('es-PE',{weekday:'long',day:'numeric',month:'long'});
+  document.getElementById('splash').style.display = 'none';
+  document.getElementById('app').classList.add('active');
+  // Reset pin screen
+  document.getElementById('pin-screen').classList.remove('active');
+  document.getElementById('profile-select').style.display = 'flex';
+  pinBuffer = '';
+  loadPhrase(); renderStats(); renderFeelings(); renderPrivate();
+  renderAgreements(); renderTogether(); renderGames();
+  renderHomePet(); initChat(); startNotifs(); updateCfgShow();
+}
+function logout() {
+  ME = null;
+  pinBuffer = '';
+  pendingUser = null;
+  // Reset PIN dots
+  for (let i=0;i<4;i++) { const d=document.getElementById('pd'+i); if(d) d.classList.remove('filled'); }
+  document.getElementById('pin-err').textContent = '';
+  // Back to profile selector
+  document.getElementById('pin-screen').classList.remove('active');
+  document.getElementById('profile-select').style.display = 'flex';
+  // Reset accent
+  document.documentElement.style.setProperty('--acc', 'var(--rose)');
+  document.documentElement.style.setProperty('--acc-l', 'var(--rose-l)');
+  document.documentElement.style.setProperty('--acc-d', 'var(--rose-d)');
+  document.documentElement.style.setProperty('--acc-glow', 'var(--rose-glow)');
+  // Hide app, show splash
+  document.getElementById('app').classList.remove('active');
+  document.getElementById('splash').style.display = 'flex';
+  closeMore();
+  stopNotifs();
+  chatHist = [];
+}
+
+// ════════════════════════════════════════════════
+// SETUP / CONFIG
+// ════════════════════════════════════════════════
+function openCfg() {
+  document.getElementById('cfg-script').value = cfg.scriptUrl;
+  document.getElementById('cfg-key').value    = cfg.claudeKey;
+  // Only show/prefill the PIN field for the logged-in user
+  const pinAndreaRow = document.getElementById('pin-andrea-row');
+  const pinCesarRow  = document.getElementById('pin-cesar-row');
+  if (ME === null) {
+    // From splash: show both PIN fields
+    if (pinAndreaRow) pinAndreaRow.style.display = 'block';
+    if (pinCesarRow)  pinCesarRow.style.display  = 'block';
+  } else if (ME === 'andrea') {
+    document.getElementById('cfg-pin1').value = '';
+    if (pinAndreaRow) pinAndreaRow.style.display = 'block';
+    if (pinCesarRow)  pinCesarRow.style.display  = 'none';
+  } else {
+    document.getElementById('cfg-pin2').value = '';
+    if (pinAndreaRow) pinAndreaRow.style.display = 'none';
+    if (pinCesarRow)  pinCesarRow.style.display  = 'block';
+  }
+  // Update modal title to be context-aware
+  const cfgTitle = document.querySelector('#ov-cfg h3');
+  if (cfgTitle) {
+    if (ME === 'andrea') cfgTitle.textContent = 'Ajustes de Andrea 🌙';
+    else if (ME === 'cesar') cfgTitle.textContent = 'Ajustes de César ✨';
+    else cfgTitle.textContent = 'Configuración inicial ⚙️';
+  }
+  document.getElementById('ov-cfg').classList.add('open');
+}
+function closeCfg() { document.getElementById('ov-cfg').classList.remove('open'); }
+function saveCfg() {
+  const p1 = document.getElementById('cfg-pin1').value;
+  const p2 = document.getElementById('cfg-pin2').value;
+  if ((p1 && (p1.length !== 4 || !/^\d+$/.test(p1)))) {
+    toast('El PIN debe ser de exactamente 4 dígitos numéricos'); return;
+  }
+  if ((p2 && (p2.length !== 4 || !/^\d+$/.test(p2)))) {
+    toast('El PIN debe ser de exactamente 4 dígitos numéricos'); return;
+  }
+  cfg.scriptUrl = document.getElementById('cfg-script').value.trim();
+  cfg.claudeKey = document.getElementById('cfg-key').value.trim();
+  // Only update the PIN for the current user (or both if from splash)
+  if (ME === null) {
+    if (p1) cfg.pin_andrea = p1;
+    if (p2) cfg.pin_cesar  = p2;
+  } else if (ME === 'andrea') {
+    if (p1) cfg.pin_andrea = p1;
+  } else if (ME === 'cesar') {
+    if (p2) cfg.pin_cesar = p2;
+  }
+  localStorage.setItem(CFG_KEY, JSON.stringify(cfg));
+  updateCfgShow(); closeCfg();
+  toast('Configuración guardada');
+}
+function updateCfgShow() {
+  const el = document.getElementById('cfg-show'); if (!el) return;
+  el.textContent = cfg.scriptUrl ? cfg.scriptUrl.substring(0,40)+'…' : 'No configurado';
+}
+
+// ════════════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════════════
+function navTo(page, btn) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.ni').forEach(n=>n.classList.remove('active'));
+  document.getElementById('page-'+page)?.classList.add('active');
+  if (btn) btn.classList.add('active');
+  else {
+    document.querySelectorAll('.ni').forEach(n=>{
+      if (n.getAttribute('onclick')?.includes("'"+page+"'")) n.classList.add('active');
+    });
+  }
+  curPage = page;
+  const hideFab = !FAB_TYPE[page];
+  document.getElementById('fab').style.display = hideFab ? 'none' : 'flex';
+  if (page==='feelings')   renderFeelings();
+  if (page==='agreements') renderAgreements();
+  if (page==='together')   renderTogether();
+  if (page==='private')    renderPrivate();
+  if (page==='games')      renderGames();
+  if (page==='home')       { renderStats(); renderHomePet(); }
+}
+
+// ════════════════════════════════════════════════
+// MORE MENU
+// ════════════════════════════════════════════════
+function openMore() { document.getElementById('more-sheet').classList.add('open'); }
+function closeMore(){ document.getElementById('more-sheet').classList.remove('open'); }
+
+// ════════════════════════════════════════════════
+// FAB
+// ════════════════════════════════════════════════
+function fabAction() {
+  if (curPage === 'agreements') {
+    if (curAgrTab === 'petition') openAdd('petition');
+    else openAdd('agreement');
+    return;
+  }
+  if (curPage === 'together') {
+    if (tF === 'moment' || tF === 'all') openAdd('moment');
+    else if (tF === 'dream') openAdd('dream');
+    else if (tF === 'date') openAdd('date');
+    else openAdd('moment');
+    return;
+  }
+  if (curPage === 'private') {
+    if (prF === 'error') openAdd('error');
+    else if (prF === 'critique') openAdd('critique');
+    else openAdd('error');
+    return;
+  }
+  if (curPage === 'feelings') {
+    if (fF === 'hurt')  openAdd('hurt');
+    else if (fF === 'annoy') openAdd('annoy');
+    else if (fF === 'good')  openAdd('good');
+    else if (fF === 'need')  openAdd('need');
+    else openAdd('hurt');
+    return;
+  }
+  const type = FAB_TYPE[curPage];
+  if (type) openAdd(type);
+}
+
+// ════════════════════════════════════════════════
+// ADD ENTRY MODAL
+// ════════════════════════════════════════════════
+function openAdd(type) {
+  selectedEmotions = [];
+  document.getElementById('e-type').value  = type || 'hurt';
+  document.getElementById('e-text').value  = '';
+  document.getElementById('e-diff').value  = '';
+  document.getElementById('e-help').value  = '';
+  document.getElementById('e-wished').value= '';
+  document.getElementById('e-prog').value  = 0;
+  document.getElementById('pv').textContent = '0';
+  const ea = document.getElementById('e-aspecto');
+  if (ea) ea.value = '';
+  const et = document.getElementById('e-title');
+  if (et) et.value = '';
+  const emd = document.getElementById('e-moment-date');
+  if (emd) emd.value = '';
+  const ed = document.getElementById('e-date');
+  if (ed) ed.value = '';
+  // Update modal title
+  const titleMap = {
+    hurt:'Algo que me hiere 💔', annoy:'Algo que me molesta 😤', good:'Me hace bien 💚',
+    need:'Necesito… 🫂', petition:'Mi petición 🙏', agreement:'Nuevo acuerdo 🤝',
+    error:'Error del pasado 🔮', critique:'Autocrítica 🪞',
+    moment:'Momento bonito ✨', dream:'Sueño o meta 🌟', date:'Fecha especial 📅',
+  };
+  document.getElementById('add-title').textContent = titleMap[type] || 'Nueva entrada';
+  onTypeChange();
+  document.getElementById('ov-add').classList.add('open');
+}
+function closeAdd() { document.getElementById('ov-add').classList.remove('open'); }
+
+function onTypeChange() {
+  const t = document.getElementById('e-type').value;
+  const priv = ['error','critique'].includes(t);
+  document.getElementById('priv-note').style.display  = priv ? 'block' : 'none';
+  document.getElementById('pet-extra').style.display  = t==='petition' ? 'block' : 'none';
+  document.getElementById('emo-extra').style.display  = priv ? 'block' : 'none';
+  document.getElementById('date-extra').style.display = t==='date' ? 'block' : 'none';
+  document.getElementById('prog-extra').style.display = t==='dream' ? 'block' : 'none';
+  // Aspecto field: only for autocrítica
+  const aspectoRow = document.getElementById('aspecto-row');
+  if (aspectoRow) aspectoRow.style.display = t==='critique' ? 'block' : 'none';
+  // Relabel wished/reflexion field
+  const wishedLbl = document.getElementById('wished-lbl');
+  if (wishedLbl) wishedLbl.textContent = t==='critique' ? 'Reflexión personal' : '¿Qué te hubiera gustado?';
+  const eWished = document.getElementById('e-wished');
+  if (eWished) eWished.placeholder = t==='critique' ? 'Escribe tu reflexión personal…' : 'Lo que hubiera preferido…';
+  // Title row and moment-date: only for moment
+  const titleRow = document.getElementById('title-row');
+  if (titleRow) titleRow.style.display = t==='moment' ? 'block' : 'none';
+  const momentDateRow = document.getElementById('moment-date-row');
+  if (momentDateRow) momentDateRow.style.display = t==='moment' ? 'block' : 'none';
+  const lbls = {
+    hurt:'¿Qué te hiere?', annoy:'¿Qué te molesta?', good:'¿Qué te hace bien?',
+    need:'¿Qué necesitas?', petition:'Tu petición activa', agreement:'Escribe el acuerdo',
+    error:'Describe lo que pasó (solo tú lo verás)', critique:'Aspecto que quiero trabajar',
+    moment:'Describe el momento 💫', dream:'Tu sueño o meta', date:'Nombre de la fecha',
+  };
+  document.getElementById('e-lbl').textContent = lbls[t]||'Descripción';
+}
+
+function togEmo(el, emo) {
+  el.classList.toggle('sel');
+  if (el.classList.contains('sel')) selectedEmotions.push(emo);
+  else selectedEmotions = selectedEmotions.filter(e=>e!==emo);
+}
+
+function saveEntry() {
+  const type = document.getElementById('e-type').value;
+  const text = document.getElementById('e-text').value.trim();
+  if (!text) { toast('Escribe algo primero'); return; }
+  if (type==='petition') {
+    const ex = [...(db.andrea||[]),...(db.cesar||[])].find(e=>e.type==='petition'&&e.active);
+    if (ex) { toast('Ya hay una petición activa'); return; }
+  }
+  const entry = {
+    id: Date.now(), type, text,
+    date: new Date().toISOString(), user: ME,
+    private: ['error','critique'].includes(type),
+    active: type==='petition' ? true : undefined,
+    done: false, streak: 0, lastCheck: null,
+  };
+  if (type==='petition') {
+    entry.difficulty = document.getElementById('e-diff').value.trim();
+    entry.help       = document.getElementById('e-help').value.trim();
+  }
+  if (['error','critique'].includes(type)) {
+    entry.wished   = document.getElementById('e-wished').value.trim();
+    entry.superado = false;
+    if (type === 'critique') {
+      entry.aspecto = document.getElementById('e-aspecto')?.value.trim() || '';
+    }
+  }
+  if (type==='moment') {
+    entry.title      = document.getElementById('e-title')?.value.trim() || '';
+    entry.momentDate = document.getElementById('e-moment-date')?.value || '';
+  }
+  if (type==='date')  entry.eventDate = document.getElementById('e-date').value;
+  if (type==='dream') entry.progress  = parseInt(document.getElementById('e-prog').value)||0;
+  if (type==='agreement') { entry.streak=0; entry.lastCheck=null; entry.done=false; }
+
+  db[ME].push(entry); saveDb(); closeAdd();
+  toast('Guardado');
+  refresh(type);
+}
+
+function refresh(type) {
+  if (['error','critique'].includes(type)) renderPrivate();
+  else if (['petition','agreement'].includes(type)) { renderAgreements(); renderHomePet(); }
+  else if (['moment','dream','date'].includes(type)) renderTogether();
+  else renderFeelings();
+  renderStats(); renderHomePet();
+}
+
+// ════════════════════════════════════════════════
+// HELPERS
+// ════════════════════════════════════════════════
+function fmtDate(iso) {
+  return new Date(iso).toLocaleDateString('es-PE',{day:'numeric',month:'short',year:'numeric'});
+}
+function authorName(e) { return e.user==='andrea'?'Andrea 🌙':'César ✨'; }
+function esc(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function daysUntil(ds){
+  if(!ds) return null;
+  const n=new Date(); n.setHours(0,0,0,0);
+  const d=new Date(ds); d.setHours(0,0,0,0);
+  return Math.round((d-n)/86400000);
+}
+
+function mkCard(e, opts={}) {
+  const t = TAGS[e.type]||{lbl:e.type,cls:'',icon:'📝'};
+  const me = e.user===ME;
+  let extras = '';
+
+  // Moment title shown as heading
+  const momentTitle = (e.type==='moment' && e.title)
+    ? `<div style="font-family:var(--font-d);font-size:1.05rem;font-weight:600;color:var(--text1);margin-bottom:4px;letter-spacing:.01em">${esc(e.title)}</div>`
+    : '';
+
+  if (e.type==='dream'&&e.progress!=null)
+    extras+=`<div class="pbar"><div class="pfill" style="width:${e.progress}%"></div></div>
+    <div style="font-size:.72rem;color:var(--text3);margin-bottom:2px">${e.progress}% completado</div>`;
+
+  if (e.type==='date'&&e.eventDate){
+    const d=daysUntil(e.eventDate);
+    let str='', cls='cdown';
+    if(d===0){str='¡Hoy es el día! 🎉';cls+=' today';}
+    else if(d>0){str=`En ${d} día${d!==1?'s':''} 📅`;}
+    else{str=`Hace ${Math.abs(d)} día${Math.abs(d)!==1?'s':''}`;cls+=' past';}
+    extras+=`<div class="${cls}">${str}</div>`;
+  }
+
+  if (['error','critique'].includes(e.type)) {
+    if (e.type==='critique' && e.aspecto)
+      extras+=`<div style="margin-top:7px;display:inline-flex;align-items:center;gap:5px;background:var(--purple-l);color:var(--purple-d);padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:600">🎯 ${esc(e.aspecto)}</div>`;
+    if (e.wished)
+      extras+=`<div style="margin-top:8px;padding:9px 11px;background:var(--bg2);border-radius:var(--r-s)"><div style="font-size:.7rem;font-weight:600;color:var(--text3);margin-bottom:3px">${e.type==='critique'?'Reflexión personal':'Me hubiera gustado'}</div><div style="font-size:.88rem;color:var(--text1);line-height:1.5">${esc(e.wished)}</div></div>`;
+    if (e.superado)
+      extras+=`<div style="margin-top:6px"><span class="superado">✅ Superado</span></div>`;
+  }
+
+  if (e.type==='agreement') {
+    if (e.streak>0)
+      extras+=`<div style="margin-top:7px"><span class="streak-badge">🔥 ${e.streak} día${e.streak!==1?'s':''} de racha</span></div>`;
+    if (e.done)
+      extras+=`<div style="margin-top:5px"><span class="done-badge">🏆 Logrado</span></div>`;
+  }
+
+  const actions = [];
+  if (me) actions.push(`<button class="btn btn-d btn-sm" onclick="delEntry(${e.id})">🗑</button>`);
+  if (e.type==='agreement'&&me&&!e.done) {
+    actions.push(`<button class="btn btn-s btn-sm" onclick="checkStreak(${e.id})">🔥 Racha hoy</button>`);
+    actions.push(`<button class="btn btn-p btn-sm" onclick="markDone(${e.id})">✅ Logrado</button>`);
+  }
+  if (e.type==='petition'&&me&&e.active)
+    actions.push(`<button class="btn btn-p btn-sm" onclick="completePet(${e.id})">✅ Cumplida</button>`);
+  if (e.type==='dream'&&me)
+    actions.push(`<button class="btn btn-s btn-sm" onclick="updProg(${e.id})">📊 Progreso</button>`);
+  if (['error','critique'].includes(e.type)&&me&&!e.superado)
+    actions.push(`<button class="btn btn-s btn-sm" onclick="markSuperado(${e.id})">✨ Superado</button>`);
+
+  return `<div class="card${e.type==='agreement'?' agr-card':''}${e.type==='petition'?' pet-card':''}" id="card-${e.id}">
+    <div class="card-hdr">
+      <span class="tag ${t.cls}">${t.icon} ${t.lbl}</span>
+      <span class="card-author">${authorName(e)}</span>
+    </div>
+    ${e.type==='petition'?`<div style="font-size:.98rem;font-weight:500;color:var(--text1);margin-bottom:6px">${esc(e.text)}</div>
+      ${e.difficulty?`<div class="pet-sub"><h4>❗ Dificultad</h4><p>${esc(e.difficulty)}</p></div>`:''}
+      ${e.help?`<div class="pet-sub"><h4>💡 Ayudaría</h4><p>${esc(e.help)}</p></div>`:''}`:
+    `${momentTitle}<div class="card-txt">${esc(e.text)}</div>`}
+    ${extras}
+    <div class="card-meta">${e.type==='moment'&&e.momentDate ? '📅 '+fmtDate(e.momentDate+'T12:00:00') : fmtDate(e.date)}</div>
+    ${actions.length?`<div class="card-actions">${actions.join('')}</div>`:''}
+  </div>`;
+}
+
+function delEntry(id) {
+  db[ME] = db[ME].filter(e=>e.id!==id);
+  saveDb();
+  renderFeelings(); renderPrivate(); renderAgreements(); renderTogether();
+  renderStats(); renderHomePet();
+}
+function checkStreak(id) {
+  const e=db[ME].find(e=>e.id===id); if(!e) return;
+  const today=new Date().toDateString();
+  if (e.lastCheck===today) { toast('Ya registraste la racha hoy 🔥'); return; }
+  const yesterday=new Date(Date.now()-86400000).toDateString();
+  if (e.lastCheck===yesterday) e.streak=(e.streak||0)+1;
+  else if (!e.lastCheck) e.streak=1;
+  else e.streak=1;
+  e.lastCheck=today; saveDb(); toast(`🔥 ¡Racha: ${e.streak} día${e.streak!==1?'s':''}!`);
+  renderAgreements();
+}
+function markDone(id) {
+  const e=db[ME].find(e=>e.id===id); if(!e) return;
+  e.done=true; saveDb(); toast('🏆 ¡Acuerdo logrado!'); renderAgreements();
+}
+function completePet(id) {
+  const e=db[ME].find(e=>e.id===id); if(!e) return;
+  e.active=false; saveDb(); toast('✅ Petición cumplida 💝');
+  renderAgreements(); renderHomePet();
+}
+function updProg(id) {
+  const v=prompt('Nuevo progreso (0–100):'); if(v===null||v==='') return;
+  const n=Math.max(0,Math.min(100,parseInt(v)||0));
+  const e=db[ME].find(e=>e.id===id); if(e){e.progress=n;saveDb();renderTogether();}
+}
+function markSuperado(id) {
+  const e=db[ME].find(e=>e.id===id); if(!e) return;
+  e.superado=true; saveDb(); toast('✨ Marcado como superado'); renderPrivate();
+}
+
+// ════════════════════════════════════════════════
+// RENDER — FEELINGS
+// ════════════════════════════════════════════════
+function fTab(f,b){fF=f;document.querySelectorAll('#page-feelings .tab').forEach(t=>t.classList.remove('active'));if(b)b.classList.add('active');renderFeelings();}
+function renderFeelings(){
+  const types=['hurt','annoy','good','need'];
+  const e=[...(db.andrea||[]),...(db.cesar||[])]
+    .filter(e=>types.includes(e.type)&&(fF==='all'||e.type===fF))
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const el=document.getElementById('list-feelings');
+  el.innerHTML=e.length?e.map(x=>mkCard(x)).join(''):
+    `<div class="empty"><div class="empty-icon">💬</div><p>No hay entradas aún.<br>Comparte cómo te sientes.</p></div>`;
+}
+
+// ════════════════════════════════════════════════
+// RENDER — AGREEMENTS
+// ════════════════════════════════════════════════
+function agrTab(f,b){curAgrTab=f;document.querySelectorAll('#page-agreements .tab').forEach(t=>t.classList.remove('active'));if(b)b.classList.add('active');renderAgreements();}
+function renderAgreements(){
+  const el=document.getElementById('list-agreements'); if(!el) return;
+  if (curAgrTab==='petition') {
+    const all=[...(db.andrea||[]),...(db.cesar||[])].filter(e=>e.type==='petition'&&e.active);
+    if (!all.length){
+      el.innerHTML=`<div class="empty"><div class="empty-icon">🙏</div><p>No hay peticiones activas.<br>Solo una petición a la vez.</p></div>`;
+      return;
+    }
+    el.innerHTML=all.map(p=>mkCard(p)).join('');
+  } else if (curAgrTab==='agreement') {
+    const agrs=[...(db.andrea||[]),...(db.cesar||[])]
+      .filter(e=>e.type==='agreement'&&!e.done)
+      .sort((a,b)=>new Date(a.date)-new Date(b.date));
+    if (!agrs.length){
+      el.innerHTML=`<div class="empty"><div class="empty-icon">🤝</div><p>No hay acuerdos activos.<br>¡Construyan sus reglas de amor!</p></div>`;
+      return;
+    }
+    el.innerHTML=agrs.map((e,i)=>`<div class="card agr-card" id="card-${e.id}">
+      <div class="agr-row">
+        <div class="agr-num">${i+1}</div>
+        <div style="flex:1">
+          <div class="card-txt">${esc(e.text)}</div>
+          ${e.streak>0?`<div style="margin-top:6px"><span class="streak-badge">🔥 ${e.streak} día${e.streak!==1?'s':''}</span></div>`:''}
+          <div class="card-meta">${authorName(e)} · ${fmtDate(e.date)}</div>
+        </div>
+        ${e.user===ME?`<div style="display:flex;gap:5px;flex-direction:column;align-items:flex-end">
+          <button class="btn btn-s btn-sm" onclick="checkStreak(${e.id})">🔥</button>
+          <button class="btn btn-p btn-sm" onclick="markDone(${e.id})" title="Logrado">✅</button>
+          <button class="btn btn-d btn-sm" onclick="delEntry(${e.id})" title="Eliminar">🗑</button>
+        </div>`:''}
+      </div>
+    </div>`).join('');
+  } else { // done
+    const done=[...(db.andrea||[]),...(db.cesar||[])].filter(e=>e.type==='agreement'&&e.done);
+    if (!done.length){
+      el.innerHTML=`<div class="empty"><div class="empty-icon">🏆</div><p>Aún no han logrado acuerdos.<br>¡Sigan así, van a llegar!</p></div>`;
+      return;
+    }
+    el.innerHTML=done.map(e=>`<div class="card" style="border-left:3px solid var(--green-d);opacity:.8">
+      <div class="card-txt">${esc(e.text)}</div>
+      <div style="margin-top:6px;display:flex;align-items:center;gap:8px">
+        <span class="done-badge">🏆 Logrado</span>
+        ${e.streak>0?`<span class="streak-badge">🔥 ${e.streak} días</span>`:''}
+      </div>
+      <div class="card-meta">${authorName(e)} · ${fmtDate(e.date)}</div>
+    </div>`).join('');
+  }
+}
+
+function renderHomePet(){
+  const el=document.getElementById('home-pet'); if(!el) return;
+  const all=[...(db.andrea||[]),...(db.cesar||[])].filter(e=>e.type==='petition'&&e.active);
+  if(!all.length){el.innerHTML='';return;}
+  const p=all[0];
+  el.innerHTML=`<div class="card pet-card" style="margin-top:2px">
+    <div style="font-size:.72rem;font-weight:700;color:var(--acc-d);margin-bottom:5px">🙏 Petición de ${authorName(p)}</div>
+    <div class="card-txt">${esc(p.text)}</div>
+  </div>`;
+}
+
+// ════════════════════════════════════════════════
+// RENDER — TOGETHER
+// ════════════════════════════════════════════════
+function tTab(f,b){
+  tF=f;
+  document.querySelectorAll('#page-together .tab').forEach(t=>t.classList.remove('active'));
+  if(b) b.classList.add('active');
+  // Show search bar only on moments tab
+  const sb = document.getElementById('together-search');
+  if (sb) sb.style.display = (f==='moment' || f==='all') ? 'block' : 'none';
+  const si = document.getElementById('moment-search');
+  if (si) si.value = '';
+  renderTogether();
+}
+function renderTogether(){
+  const types=['moment','dream','date'];
+  const searchVal = (document.getElementById('moment-search')?.value||'').toLowerCase().trim();
+  let e=[...(db.andrea||[]),...(db.cesar||[])]
+    .filter(x=>types.includes(x.type)&&(tF==='all'||x.type===tF))
+    .filter(x=>{
+      if (!searchVal || x.type !== 'moment') return true;
+      return (x.title||'').toLowerCase().includes(searchVal) ||
+             (x.text||'').toLowerCase().includes(searchVal);
+    })
+    .sort((a,b)=>a.type==='date'&&b.type==='date'?new Date(a.eventDate||0)-new Date(b.eventDate||0):new Date(b.date)-new Date(a.date));
+  const el=document.getElementById('list-together');
+  el.innerHTML=e.length?e.map(x=>mkCard(x)).join(''):
+    searchVal
+      ? `<div class="empty"><div class="empty-icon">🔍</div><p>Sin resultados para "${esc(searchVal)}"</p></div>`
+      : `<div class="empty"><div class="empty-icon">🌟</div><p>Registren momentos, sueños<br>y fechas especiales juntos.</p></div>`;
+}
+
+// ════════════════════════════════════════════════
+// RENDER — PRIVATE
+// ════════════════════════════════════════════════
+function prTab(f,b){prF=f;document.querySelectorAll('#page-private .tab').forEach(t=>t.classList.remove('active'));if(b)b.classList.add('active');renderPrivate();}
+function renderPrivate(){
+  const types=['error','critique'];
+  let e=(db[ME]||[]).filter(x=>types.includes(x.type)&&(prF==='all'||x.type===prF))
+    .sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const el=document.getElementById('list-private');
+  el.innerHTML=e.length?e.map(x=>mkCard(x)).join(''):
+    `<div class="empty"><div class="empty-icon">🔒</div><p>Tu espacio privado está vacío.<br>Es un lugar seguro solo para ti.</p></div>`;
+}
+
+// ════════════════════════════════════════════════
+// RENDER — STATS
+// ════════════════════════════════════════════════
+function renderStats(){
+  const all=[...(db.andrea||[]),...(db.cesar||[])];
+  const agrs=all.filter(e=>e.type==='agreement'&&!e.done).length;
+  const moms=all.filter(e=>e.type==='moment').length;
+  const my=(db[ME]||[]).length;
+  document.getElementById('stats-row').innerHTML=`
+    <div class="stat"><div class="stat-n">${agrs}</div><div class="stat-l">Acuerdos activos</div></div>
+    <div class="stat"><div class="stat-n">${moms}</div><div class="stat-l">Momentos bonitos</div></div>
+    <div class="stat"><div class="stat-n">${my}</div><div class="stat-l">Mis entradas</div></div>`;
+}
+
+// ════════════════════════════════════════════════
+// RENDER — GAMES
+// ════════════════════════════════════════════════
+function gTab(f,b){gF=f;document.querySelectorAll('#page-games .tab').forEach(t=>t.classList.remove('active'));if(b)b.classList.add('active');renderGames();}
+let curRuleta=null, curPregunta=null;
+function renderGames(){
+  const el=document.getElementById('games-content'); if(!el) return;
+  let h='';
+  if(gF==='all'||gF==='spin'){
+    h+=`<div class="game-feature">
+      <h3>🎰 Ruleta del Amor</h3>
+      <p>Giren la ruleta y descubran qué actividad romántica les toca hoy</p>
+      <button class="btn btn-p btn-f" onclick="spinRuleta()" style="border-radius:30px">Girar 🎰</button>
+      <div id="res-ruleta">${curRuleta!=null?`<div class="spin-result">${esc(RULETA[curRuleta])}</div>`:''}</div>
+    </div>`;
+  }
+  if(gF==='all'||gF==='preg'){
+    h+=`<div class="game-feature">
+      <h3>❓ Pregunta del día</h3>
+      <p>Una pregunta para conocerse más y conectar profundamente</p>
+      <button class="btn btn-p btn-f" onclick="newPregunta()" style="border-radius:30px">Nueva pregunta 🎲</button>
+      <div id="res-preg">${curPregunta!=null?`<div class="spin-result">${esc(PREGUNTAS[curPregunta])}</div>`:''}</div>
+    </div>`;
+  }
+  if(gF==='all'||gF==='reto'){
+    const active=challenges.filter(c=>!c.done);
+    const done=challenges.filter(c=>c.done);
+    h+=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;margin-top:4px">
+      <h3 style="font-family:var(--font-d);font-size:1.1rem;font-weight:400;color:var(--text1)">🏆 Retos de pareja</h3>
+      <button class="btn btn-p btn-sm" onclick="addReto()">+ Nuevo</button>
+    </div>`;
+    if(!challenges.length){
+      h+=`<div class="empty"><div class="empty-icon">🏆</div><p>No hay retos.<br>¡Añadan uno y complétanlo juntos!</p></div>`;
+    } else {
+      h+=challenges.map((c,i)=>`
+        <div class="card" style="border-left:3px solid ${c.done?'var(--green-d)':'var(--acc)'}">
+          <div style="display:flex;align-items:flex-start;gap:10px">
+            <div style="flex:1">
+              <div class="card-txt">${esc(c.text)}</div>
+              <div style="display:flex;gap:6px;margin-top:7px;align-items:center;flex-wrap:wrap">
+                <span class="tag ${c.diff==='e'?'diff-e':c.diff==='m'?'diff-m':'diff-h'}">
+                  ${c.diff==='e'?'🟢 Fácil':c.diff==='m'?'🟡 Medio':'🔴 Difícil'}
+                </span>
+                ${c.done?'<span class="done-badge">✅ Completado</span>':'<span style="font-size:.72rem;color:var(--text3)">⏳ Pendiente</span>'}
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:5px;flex-shrink:0">
+              ${!c.done?`<button class="btn btn-p btn-sm" onclick="doneReto(${i})">✅</button>`:''}
+              <button class="btn btn-d btn-sm" onclick="removeReto(${i})">🗑</button>
+            </div>
+          </div>
+        </div>`).join('');
+    }
+  }
+  el.innerHTML=h;
+}
+
+function spinRuleta(){
+  curRuleta=Math.floor(Math.random()*RULETA.length);
+  const el=document.getElementById('res-ruleta');
+  if(el) el.innerHTML=`<div class="spin-result">${esc(RULETA[curRuleta])}</div>`;
+}
+function newPregunta(){
+  curPregunta=Math.floor(Math.random()*PREGUNTAS.length);
+  const el=document.getElementById('res-preg');
+  if(el) el.innerHTML=`<div class="spin-result">${esc(PREGUNTAS[curPregunta])}</div>`;
+}
+// ── RETO MODAL STATE ──
+let retoMode = 'random';   // 'random' | 'custom'
+let retoDiff = 'e';
+let retoSuggIdx = -1;
+
+function addReto(){ openRetoModal(); }
+
+function openRetoModal(){
+  retoMode = 'random'; retoDiff = 'e';
+  document.getElementById('reto-custom-text').value = '';
+  retoTab('random');
+  selDiff('e');
+  shuffleSuggestion();
+  document.getElementById('ov-reto').classList.add('open');
+}
+function closeRetoModal(){ document.getElementById('ov-reto').classList.remove('open'); }
+
+function retoTab(mode){
+  retoMode = mode;
+  const isRandom = mode === 'random';
+  document.getElementById('reto-random-panel').style.display = isRandom ? 'block' : 'none';
+  document.getElementById('reto-custom-panel').style.display = isRandom ? 'none' : 'block';
+  document.getElementById('reto-tab-random').className = isRandom ? 'btn btn-p' : 'btn btn-s';
+  document.getElementById('reto-tab-custom').className = isRandom ? 'btn btn-s' : 'btn btn-p';
+}
+
+function selDiff(d){
+  retoDiff = d;
+  ['e','m','h'].forEach(k=>{
+    const b = document.getElementById('rd-'+k);
+    if (!b) return;
+    const colors = {e:'var(--green-l)/var(--green-d)', m:'var(--amber-l)/var(--amber-d)', h:'var(--red-l)/var(--red-d)'};
+    const [bg, fg] = colors[k].split('/');
+    b.style.background    = `var(--${k==='e'?'green':k==='m'?'amber':'red'}-l)`;
+    b.style.color         = `var(--${k==='e'?'green':k==='m'?'amber':'red'}-d)`;
+    b.style.borderColor   = k === d ? `var(--${k==='e'?'green':k==='m'?'amber':'red'}-d)` : 'transparent';
+    b.style.fontWeight    = k === d ? '700' : '500';
+    b.style.transform     = k === d ? 'scale(1.04)' : 'scale(1)';
+  });
+}
+
+function shuffleSuggestion(){
+  const available = RETOS.filter(r=>!challenges.find(c=>c.text===r.text));
+  if (!available.length){
+    document.getElementById('reto-suggestion').textContent = '¡Ya tienen todos los retos sugeridos! Creen uno personalizado.';
+    return;
+  }
+  let idx;
+  do { idx = Math.floor(Math.random()*available.length); } while(idx === retoSuggIdx && available.length > 1);
+  retoSuggIdx = idx;
+  const r = available[idx];
+  const diff = r.diff==='e'?'🟢 Fácil':r.diff==='m'?'🟡 Medio':'🔴 Difícil';
+  document.getElementById('reto-suggestion').innerHTML =
+    `<div style="font-size:.88rem;margin-bottom:6px">${esc(r.text)}</div>
+     <span style="font-size:.72rem;font-weight:600;color:var(--text3)">${diff}</span>`;
+  selDiff(r.diff);
+}
+
+function saveReto(){
+  let text, diff;
+  if (retoMode === 'random') {
+    const available = RETOS.filter(r=>!challenges.find(c=>c.text===r.text));
+    if (!available.length || retoSuggIdx < 0 || retoSuggIdx >= available.length) {
+      closeRetoModal(); return;
+    }
+    const r = available[retoSuggIdx];
+    text = r.text; diff = r.diff;
+  } else {
+    text = document.getElementById('reto-custom-text').value.trim();
+    if (!text) return;
+    diff = retoDiff;
+  }
+  challenges.push({ text, diff, done: false, custom: retoMode==='custom', added: new Date().toISOString() });
+  saveChallenges(); closeRetoModal(); renderGames();
+}
+
+function doneReto(i){ challenges[i].done=true; saveChallenges(); renderGames(); }
+function removeReto(i){ challenges.splice(i,1); saveChallenges(); renderGames(); }
+function saveChallenges(){ localStorage.setItem(CH_KEY,JSON.stringify(challenges)); }
+
+// ════════════════════════════════════════════════
+// DAILY PHRASE
+// ════════════════════════════════════════════════
+function loadPhrase(){
+  const i=(new Date().getDay()+(new Date().getDate()>>1))%PHRASES.length;
+  document.getElementById('daily-phrase').textContent=PHRASES[i];
+}
+
+// ════════════════════════════════════════════════
+// DARK MODE
+// ════════════════════════════════════════════════
+function togDark(btn){
+  btn.classList.toggle('on');
+  cfg.dark=btn.classList.contains('on');
+  applyDark(cfg.dark);
+  localStorage.setItem(CFG_KEY,JSON.stringify(cfg));
+}
+function applyDark(on){
+  if (on) document.body.classList.add('dark');
+  else document.body.classList.remove('dark');
+  if (ME) {
+    document.body.className=(ME==='andrea'?'andrea':'cesar')+(on?' dark':'');
+  }
+}
+
+// ════════════════════════════════════════════════
+// NOTIFICATIONS
+// ════════════════════════════════════════════════
+function startNotifs(){
+  if(!cfg.notif) return; stopNotifs();
+  setTimeout(()=>showPhrase(),20000);
+  notifTimer=setInterval(()=>showPhrase(), 4*60*60*1000);
+}
+function stopNotifs(){ if(notifTimer) clearInterval(notifTimer); }
+function showPhrase(){
+  if(!ME) return;
+  const p=PHRASES[Math.floor(Math.random()*PHRASES.length)];
+  toast('💝 '+p, 6000);
+  if(Notification.permission==='granted'&&'serviceWorker' in navigator){
+    navigator.serviceWorker.ready.then(sw=>{
+      sw.showNotification('💝 ELyLE',{body:p,tag:'elyle',vibrate:[100,50,100]});
+    });
+  }
+}
+function reqPush(){
+  if(!('Notification' in window)){toast('Tu navegador no soporta notificaciones');return;}
+  Notification.requestPermission().then(p=>{
+    if(p==='granted') toast('🔔 Push activado ✅');
+    else toast('❌ Permiso denegado — actívalo en ajustes');
+  });
+}
+function togSet(k,b){ b.classList.toggle('on'); cfg.notif=b.classList.contains('on'); localStorage.setItem(CFG_KEY,JSON.stringify(cfg)); if(cfg.notif) startNotifs(); else stopNotifs(); }
+
+// ════════════════════════════════════════════════
+// AI CHAT
+// ════════════════════════════════════════════════
+function initChat(){
+  const name=ME==='andrea'?'Andrea':'César';
+  const partner=ME==='andrea'?'César ✨':'Andrea 🌙';
+  document.getElementById('chat-msgs').innerHTML=`<div class="cb ai">
+    Hola ${name} 💝<br><br>
+    Soy tu acompañante de pareja virtual. Estoy aquí para escucharte, ayudarte a reflexionar y guiarte hacia una comunicación más amorosa con ${partner}.<br><br>
+    <strong>¿Cómo te sientes hoy?</strong>
+  </div>`;
+  chatHist=[];
+}
+function chatKey(e){ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();} }
+function autoH(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,88)+'px'; }
+
+async function sendChat(){
+  const inp=document.getElementById('chat-in');
+  const msg=inp.value.trim(); if(!msg) return;
+  inp.value=''; inp.style.height='auto';
+  const btn=document.getElementById('chat-btn'); btn.disabled=true;
+  appendBubble(msg,'user');
+  const tid='t'+Date.now();
+  const msgs=document.getElementById('chat-msgs');
+  msgs.innerHTML+=`<div class="cb ai typing" id="${tid}"><div class="tdot"></div><div class="tdot"></div><div class="tdot"></div></div>`;
+  scrollChat();
+  const pkey=ME==='andrea'?'cesar':'andrea';
+  const pname=ME==='andrea'?'César':'Andrea';
+  const myN=ME==='andrea'?'Andrea':'César';
+  // Build full context including private — AI uses this to understand, not to reveal
+  const fmtEntries = (entries) => entries.map(e => {
+    let line = `[${TAGS[e.type]?.lbl||e.type}] ${e.text}`;
+    if (e.aspecto)  line += ` | Aspecto: ${e.aspecto}`;
+    if (e.wished)   line += ` | Reflexión: ${e.wished}`;
+    if (e.emotions?.length) line += ` | Emociones: ${e.emotions.join(', ')}`;
+    return line;
+  }).join('\n') || 'Ninguna';
+
+  const myAll    = (db[ME]||[]).slice(-15);
+  const ptAll    = (db[pkey]||[]).filter(e=>!e.private).slice(-12); // partner public only
+  const myPriv   = (db[ME]||[]).filter(e=>e.private).slice(-8);
+  const agrs     = [...(db.andrea||[]),...(db.cesar||[])].filter(e=>e.type==='agreement'&&!e.done);
+  const peticion = [...(db.andrea||[]),...(db.cesar||[])].find(e=>e.type==='petition'&&e.active);
+  const retosAct = challenges.filter(c=>!c.done).slice(0,3);
+
+  const ctx=`CONTEXTO COMPLETO DE LA PAREJA: ELyLE
+Usuario activo: ${myN} | Pareja: ${pname}
+
+== ENTRADAS DE ${myN.toUpperCase()} (todas, incluyendo privadas) ==
+${fmtEntries(myAll)}
+
+== REFLEXIONES PRIVADAS DE ${myN.toUpperCase()} (CONFIDENCIAL — usa solo para aconsejar, NUNCA revelar) ==
+${fmtEntries(myPriv)}
+
+== ENTRADAS DE ${pname.toUpperCase()} (públicas) ==
+${fmtEntries(ptAll)}
+
+== ACUERDOS ACTIVOS ==
+${agrs.map(e=>e.text+(e.streak>0?` (🔥 ${e.streak} días)`:'') ).join('\n')||'Ninguno'}
+
+== PETICIÓN ACTIVA ==
+${peticion ? `De ${peticion.user==='andrea'?'Andrea':'César'}: ${peticion.text}` : 'Ninguna'}
+
+== RETOS EN CURSO ==
+${retosAct.map(c=>c.text).join('\n')||'Ninguno'}`;
+
+  chatHist.push({role:'user',content:msg});
+  if(!cfg.claudeKey){
+    document.getElementById(tid)?.remove();
+    appendBubble('Configura tu clave API de Anthropic en ⚙️ Ajustes → Configuración para usar la IA.','ai');
+    btn.disabled=false; return;
+  }
+  try {
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{
+        'Content-Type':'application/json',
+        'x-api-key':cfg.claudeKey,
+        'anthropic-version':'2023-06-01',
+        'anthropic-dangerous-direct-browser-access':'true'
+      },
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514', max_tokens:1000,
+        system:`Eres Luna, terapeuta de pareja virtual empática y sabia que acompaña a César y Andrea en su relación "ELyLE — entre la luna y las estrellas". Hablas en español peruano natural, cálido y cercano.
+
+ACCESO A INFORMACIÓN PRIVADA — REGLAS DE ORO:
+1. Tienes acceso al contexto completo incluyendo errores del pasado, autocríticas y reflexiones privadas de ${myN}.
+2. Esta información privada es SOLO para que puedas entender mejor la situación y dar consejos más precisos y empáticos.
+3. JAMÁS menciones, cites, parafrasees ni hagas referencia directa al contenido privado — ni siquiera insinúes que lo sabes.
+4. Úsalo solo internamente: si ves un patrón de autocrítica sobre "paciencia", puedes sugerir ejercicios de paciencia sin decir "vi que escribiste sobre paciencia".
+5. Nunca reveles datos de ${pname} que ${myN} no haya compartido directamente contigo en esta conversación.
+
+CÓMO ACONSEJAR:
+- Valida las emociones antes de dar perspectiva
+- Habla directamente con ${myN}, menciona a ${pname} con cariño
+- Sé constructivo, positivo y esperanzador — enfócate en el crecimiento
+- Máximo 3 párrafos fluidos por respuesta
+- Sugiere ejercicios o técnicas concretas cuando sea útil
+- Usa emojis con moderación (💝 🌙 ✨) para calidez
+
+${ctx}`,
+        messages:chatHist.slice(-12)
+      })
+    });
+    const d=await res.json();
+    const reply=d.content?.map(b=>b.text||'').join('')||'No pude procesar tu mensaje.';
+    document.getElementById(tid)?.remove();
+    appendBubble(reply,'ai');
+    chatHist.push({role:'assistant',content:reply});
+  } catch(e){
+    document.getElementById(tid)?.remove();
+    appendBubble('Error de conexión. Verifica la clave API e intenta de nuevo.','ai');
+  }
+  btn.disabled=false;
+}
+function appendBubble(text,role){
+  const el=document.getElementById('chat-msgs');
+  const d=document.createElement('div');
+  d.className=`cb ${role}`;
+  d.innerHTML=text.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\*(.*?)\*/g,'<em>$1</em>');
+  el.appendChild(d); scrollChat();
+}
+function scrollChat(){ const e=document.getElementById('chat-msgs'); if(e) e.scrollTop=e.scrollHeight; }
+
+// ════════════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════════════
+let toastT=null;
+function toast(msg, dur=2000){
+  // Silent — no visual toast
+}
+
+// ════════════════════════════════════════════════
+// PERSIST / SYNC
+// ════════════════════════════════════════════════
+function saveDb(){
+  localStorage.setItem(DB_KEY,JSON.stringify(db));
+  const el=document.getElementById('last-sync'); if(el) el.textContent=new Date().toLocaleTimeString('es-PE');
+  // Background sync to Sheets if configured
+  if (cfg.scriptUrl) pushToSheets();
+}
+
+async function pushToSheets(){
+  if (!cfg.scriptUrl) return;
+  try {
+    const payload = {
+      action:'push',
+      data: db,
+      challenges: challenges,
+      config: { name1:'Andrea', name2:'César' }
+    };
+    await fetch(cfg.scriptUrl, {
+      method:'POST', mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify(payload)
+    });
+  } catch(e){ /* silent background sync */ }
+}
+async function syncNow(){
+  if(!cfg.scriptUrl){ openCfg(); return; }
+  try{
+    const payload = {
+      action: 'sync',
+      data: db,
+      challenges: challenges,
+      config: { name1:'Andrea', name2:'César', coupleName:'ELyLE' }
+    };
+    const r = await (await fetch(cfg.scriptUrl,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain'},
+      body: JSON.stringify(payload)
+    })).text().catch(()=>'{}');
+    // no-cors returns opaque response — assume success if no network error
+    const parsed = (() => { try { return JSON.parse(r); } catch { return {success:true}; } })();
+    if (parsed.data) { db={...db,...parsed.data}; }
+    if (parsed.challenges) { challenges = parsed.challenges; saveChallenges(); }
+    saveDb();
+    document.getElementById('last-sync').textContent = new Date().toLocaleTimeString('es-PE');
+    renderFeelings(); renderPrivate(); renderAgreements(); renderTogether(); renderStats();
+  } catch(e){
+    console.error('Sync error:', e);
+  }
+}
+function exportData(){
+  const s=JSON.stringify({user:ME,entries:db[ME]},null,2);
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([s],{type:'application/json'}));
+  a.download=`elyle_${ME}_${new Date().toISOString().split('T')[0]}.json`;
+  a.click();
+}
+function clearData(){
+  if(!confirm('¿Borrar todos tus datos?'))return;
+  if(!confirm('¿Estás seguro? No se puede deshacer.'))return;
+  db[ME]=[]; saveDb();
+  renderFeelings();renderPrivate();renderAgreements();renderTogether();renderStats();renderHomePet();
+  toast('Datos borrados');
+}
+
+// ════════════════════════════════════════════════
+// SERVICE WORKER (push)
+// ════════════════════════════════════════════════
+function registerSW(){
+  if(!('serviceWorker' in navigator)) return;
+  const code=`self.addEventListener('install',e=>self.skipWaiting());
+self.addEventListener('activate',e=>e.waitUntil(clients.claim()));
+self.addEventListener('push',e=>{
+  const d=e.data?e.data.json():{title:'💝 ELyLE',body:'Un momento para conectar.'};
+  e.waitUntil(self.registration.showNotification(d.title||'💝 ELyLE',{body:d.body,tag:'elyle',vibrate:[100,50,100]}));
+});`;
+  navigator.serviceWorker.register(URL.createObjectURL(new Blob([code],{type:'application/javascript'}))).catch(()=>{});
+}
+
+// ════════════════════════════════════════════════
+// BOOT
+// ════════════════════════════════════════════════
+init();
+registerSW();
+</script>
+</body>
+</html>
